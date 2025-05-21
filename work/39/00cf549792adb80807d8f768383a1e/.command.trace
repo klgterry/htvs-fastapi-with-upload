@@ -1,0 +1,17 @@
+nextflow.trace/v2
+realtime=130631
+%cpu=18295
+cpu_model=Intel(R) Xeon(R) Silver 4310 CPU @ 2.10GHz
+rchar=42745838
+wchar=11281008
+syscr=15524
+syscw=1263
+read_bytes=4599808
+write_bytes=11255808
+%mem=4
+vmem=8400372
+rss=597112
+peak_vmem=8461400
+peak_rss=597112
+vol_ctxt=149934
+inv_ctxt=273

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}AIDD{% endblock %}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background-color: #f9fbfd;
+      color: #333;
+    }
+
+    .page-wrapper {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    main {
+      flex: 1;
+    }
+
+    nav {
+      background-color: #003366;
+      padding: 14px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    nav .brand {
+      color: #fff;
+      font-size: 22px;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    nav .nav-links a {
+      color: #fff;
+      margin-left: 20px;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .hero {
+      padding: 80px 40px;
+      text-align: center;
+      background: linear-gradient(to right, #e3f2fd, #fff);
+    }
+
+    .hero h1 {
+      font-size: 40px;
+      margin-bottom: 20px;
+      color: #003366;
+    }
+
+    .hero p {
+      font-size: 18px;
+      margin-bottom: 30px;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .hero a.button {
+      display: inline-block;
+      padding: 12px 24px;
+      background-color: #007acc;
+      color: white;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 500;
+      margin-top: 30px;
+    }
+
+    .section {
+      padding: 60px 30px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .section h2 {
+      color: #003366;
+      margin-bottom: 20px;
+    }
+
+    .section p {
+      line-height: 1.6;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      background-color: #eee;
+      color: #555;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-wrapper">
+    <!-- Navigation Bar -->
+    <nav>
+      <a href="/" class="brand">🧠 AIDD</a>
+      <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/dashboard">📊 Dashboard</a>
+        <a href="/builder">🧪 HTVS Protocol</a>
+        <a href="/scaffold">🧱 Scaffold Hopping</a>
+        <a href="/generation">🧬 Molecular Generation</a>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+      {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer>
+      © 2025 AIDD — Empowering intelligent drug discovery.
+    </footer>
+  </div>
+</body>
+</html>

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Results – AIDD{% endblock %}
+
+{% block content %}
+<div class="results-container">
+  <h2>✅ HTVS Pipeline Execution Complete</h2>
+  <p>Your selected modules have been successfully executed.</p>
+
+  <h3>📥 Download Output</h3>
+  <a href="/results/ranked.csv" download>Download ranked.csv</a>
+
+  <h3>📈 Execution Report</h3>
+  <iframe id="reportFrame" src="/results/{{ report_file }}" width="100%" style="border:1px solid #ccc;" onload="resizeIframe(this)"></iframe>
+
+  <h3>🕒 Timeline</h3>
+  <iframe id="timelineFrame" src="/results/{{ timeline_file }}" width="100%" style="border:1px solid #ccc;" onload="resizeIframe(this)"></iframe>
+
+  <br>
+  <a href="/builder"
+     style="display:block; text-align:center; margin-top:20px; padding:10px 20px; background:#007acc; color:white; text-decoration:none; border-radius:6px;">
+    🔄 Run Another Workflow
+  </a>
+</div>
+
+<!-- Iframe Resize Script -->
+<script>
+function resizeIframe(iframe) {
+  try {
+    const contentHeight = iframe.contentWindow.document.body.scrollHeight;
+    iframe.style.height = contentHeight + 'px';
+  } catch (e) {
+    console.warn("⚠️ Could not auto-resize iframe (maybe cross-origin?):", e);
+  }
+}
+</script>
+
+<style>
+.results-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+</style>
+{% endblock %}

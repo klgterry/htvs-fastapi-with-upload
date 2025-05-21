@@ -1,0 +1,1 @@
+FATAL: Cowardly refusing to overwrite already existing file '/curate/protein_prep/modeller/aligned.aln'. Use --force to force overwriting.
