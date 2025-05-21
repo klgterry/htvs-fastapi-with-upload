@@ -1,8 +1,19 @@
+# Python/venv
 venv/
 __pycache__/
 *.pyc
+
+# Nextflow
+work/
+.nextflow/
+.nextflow.log*
+*.nf.cache
+
+# Outputs
 uploads/
 results/
-.nextflow/
 *.log
-*.db
+
+# Editor
+.vscode/
+.DS_Store
