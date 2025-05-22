@@ -33,12 +33,4 @@ workflow.onComplete {
         total: workflow.stats.totalCount
     ]
     new File("${outdir}/status.json").text = groovy.json.JsonOutput.toJson(json)
-
-    // Also move report and timeline if they exist
-    ["report.html", "timeline.html"].each { fileName ->
-        def file = new File(fileName)
-        if (file.exists()) {
-            file.renameTo(new File("${outdir}/${fileName}"))
-        }
-    }
 }

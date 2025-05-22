@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% block title %}Home – AIDD{% endblock %}
+
+{% block content %}
+<section class="hero" style="padding: 20px 0;">
+  <h1>Empowering Drug Discovery with Multiscale AI</h1>
+  <p>
+    AIDD combines artificial intelligence with computational science to accelerate early-stage hit discovery
+    through scaffold exploration, HTVS, and de novo molecule generation — building an integrated AI pipeline
+    that connects hit-to-lead and optimization seamlessly.
+  </p>
+</section>
+
+<!-- 가로 레이아웃 -->
+<section class="section" style="padding: 40px 20px;">
+  <div style="display: flex; flex-wrap: nowrap; gap: 48px; justify-content: center; align-items: flex-start;">
+    
+    <!-- 🖥️ Cluster Status -->
+ <div style="flex: 1.5; min-width: 400px; max-width: 500px; margin-right: 60px;">
+      <h2>🖥️ Cluster Node Status</h2>
+      <div id="node-status-container"
+           style="display: flex; flex-direction: column; gap: 20px; margin-top: 20px;"></div>
+    </div>
+
+    <!-- 📊 Dashboard -->
+    <div style="flex: 2; min-width: 500px; margin-left: 60px;">
+      <h2>📊 Execution Dashboard</h2>
+      <p style="margin-bottom: 12px;">Check the latest pipeline runs below.</p>
+      <div id="dashboard-summary"
+        style="display: flex; flex-direction: column; gap: 12px;
+                width: 100%; max-width: 800px; margin: 0 auto;">
+    </div>
+    </div>
+
+  </div>
+</section>
+
+
+
+<script>
+const nodeHosts = [
+  { name: "node01", ip: "10.10.20.10:8000" },
+  { name: "node02", ip: "10.10.20.11:8000" },
+  { name: "node03", ip: "10.10.20.12:8500" }
+];
+
+function initNodeCards() {
+  const container = document.getElementById("node-status-container");
+  nodeHosts.forEach(({ name }) => {
+    const card = document.createElement("div");
+    card.id = `node-card-${name}`;
+
+    card.style = `
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    width: 500px;
+    max-width: 600px;   /* ✅ 부모가 넓어졌으니 이제 100%로 확장 가능 */
+    font-size: 14px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    `;
+
+
+
+    card.innerHTML = `<strong>🔄 ${name} loading...</strong>`;
+    container.appendChild(card);
+  });
+}
+
+
+function updateNodeData() {
+  nodeHosts.forEach(({ name, ip }) => {
+    fetch(`http://${ip}/system/status`)
+      .then(res => res.json())
+      .then(data => {
+        const color = data.cpu_percent > 80 ? "#e74c3c" :
+                      data.cpu_percent > 50 ? "#f1c40f" : "#2ecc71";
+        console.log(`[${data.host}] GPU USAGE RAW =`, data.gpu_usage);
+        const gpuUsageClean = data.gpu_usage.replace(/<br\s*\/?>/gi, ' ');
+        const html = `
+            <div style="font-weight: 700; color: #003366; font-size: 16px; margin-bottom: 6px;">
+                🖥️ ${data.host}
+            </div>
+            <hr style="border-top: 1px solid #ddd; margin: 4px 0 8px;">
+            <div style="line-height: 1.6; font-size: 14px; color: #333;">
+                <div><strong>🧠 CPU:</strong> ${data.cpu_percent}% (${data.cpu_count} cores)</div>
+                <div><strong>💾 Memory:</strong> ${data.mem_used} / ${data.mem_total} GB</div>
+                <div><strong>🎮 GPU:</strong> ${gpuUsageClean}</div>
+                <div style="margin-top: 10px;">
+                <span style="
+                padding: 6px 10px;
+                background: ${color};
+                color: white;
+                border-radius: 6px;
+                font-weight: 600;
+                font-size: 13px;
+                letter-spacing: 0.5px;
+                ">
+                ${data.cpu_percent > 80 ? "Busy" : data.cpu_percent > 50 ? "Moderate" : "Idle"}
+                </span>
+            </div>
+            </div>
+            
+            `;
+
+        const card = document.getElementById(`node-card-${name}`);
+        if (card) card.innerHTML = html;
+      }).catch(() => {
+        const card = document.getElementById(`node-card-${name}`);
+        if (card) card.innerHTML = `<strong style="color:#cc0000;">🚫 ${name} 연결 실패</strong>`;
+      });
+  });
+}
+
+function loadRecentRuns() {
+  fetch('/recent_runs')
+    .then(res => res.json())
+    .then(runs => {
+      const container = document.getElementById("dashboard-summary");
+      runs.forEach(run => {
+        const card = document.createElement("div");
+        card.style = `
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 10px 16px;
+            width: 100%;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            font-size: 14px;
+            line-height: 1.4;
+            `;
+
+
+        card.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                <div style="font-weight: bold; color: green;">🟢 Completed</div>
+                <div><strong>ID:</strong> ${run.run_id}</div>
+                <div><strong>User:</strong> ${run.user}</div>
+                <div><strong>Job:</strong> ${run.job_name}</div>
+                <div><strong>Start:</strong> ${run.start_time}</div>
+                </div>
+                <div style="min-width: 60px; text-align: right;">
+                <a href="/results/${run.run_id}" style="font-size: 13px;">📄 View</a>
+                </div>
+            </div>
+            `;
+
+        container.appendChild(card);
+      });
+    });
+}
+
+initNodeCards();
+setTimeout(updateNodeData, 200);
+setInterval(updateNodeData, 5000);
+loadRecentRuns();
+</script>
+
+<style>
+    #node-status-container {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;     /* ✅ 카드가 부모 폭을 꽉 채우도록 */
+    width: 100%;
+    gap: 20px;
+    }
+</style>
+
+
+{% endblock %}

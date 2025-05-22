@@ -3,42 +3,43 @@
 {% block title %}HTVS Dashboard{% endblock %}
 
 {% block content %}
-<div style="padding-left: 40px; padding-top: 30px;">
-    <h2 style="margin-top: 30px;">🚀 실행 대시보드</h2>
-    <p>진행 중인 작업을 확인하고, 완료된 결과를 열어보세요.</p>
+<div style="padding-left: 40px; padding-top: 10px;">
+  <h2 style="margin-top: 30px;">🚀 Execution Dashboard</h2>
+  <p>Check the status of running jobs and view the completed results.</p>
 
-    <div id="dashboard" style="display: flex; flex-wrap: wrap; gap: 16px; margin-top: 24px;">
+  <div id="dashboard" style="display: flex; flex-wrap: wrap; gap: 16px; margin-top: 24px;">
     {% for run in runs %}
-        <div class="run-card"
-            id="{{ run.run_id }}"
-            style="border: 2px solid #ccc; border-radius: 8px; padding: 16px; width: 300px; background-color: #fdfdfd; box-shadow: 2px 2px 6px rgba(0,0,0,0.05);">
-        
-        <!-- 상태 영역: JavaScript로 갱신됨 -->
+      <div class="run-card"
+           id="{{ run.run_id }}"
+           style="border: 2px solid #ccc; border-radius: 8px; padding: 16px; width: 300px; background-color: #fdfdfd; box-shadow: 2px 2px 6px rgba(0,0,0,0.05);">
+
+        <!-- Status section: updated by JavaScript -->
         <h3 class="status" style="margin-top: 0;">
-            {% if run.status == "DONE" %}
-            🟢 완료
-            {% elif run.status == "RUNNING" %}
-            🟡 실행 중
-            {% else %}
-            🔴 실패
-            {% endif %}
+          {% if run.status == "DONE" %}
+            🟢 Completed
+          {% elif run.status == "RUNNING" %}
+            🟡 Running
+          {% else %}
+            🔴 Failed
+          {% endif %}
         </h3>
 
-        <p><strong>Run ID:</strong> {{ run.run_id }}</p>
+        <p><strong style="color:#003366;">Run ID:</strong> {{ run.run_id }}</p>
         <p><strong style="color:#003366;">User:</strong> {{ run.user }}</p>
         <p><strong style="color:#003366;">Job Name:</strong> {{ run.job_name }}</p>
-        <p><strong>시작 시각:</strong> {{ run.start_time }}</p>
+        <p><strong style="color:#003366;">Start Time:</strong> {{ run.start_time }}</p>
 
-        <!-- 진행률 영역: JavaScript로 갱신됨 -->
-        <p class="progress">진행: {{ run.succeeded }}/{{ run.total }}</p>
+        <!-- Progress section: updated by JavaScript -->
+        <p class="progress">
+          <strong style="color:#003366;">Progress:</strong> {{ run.succeeded }}/{{ run.total }}
+        </p>
 
-        <a href="/results/{{ run.run_id }}" style="color: #007acc;">📄 결과 보기</a>
-        <button class="delete-btn" data-run="{{ run.run_id }}">🗑️ 삭제</button>
-        </div>
+        <a href="/results/{{ run.run_id }}" style="color: #007acc;">📄 View Results</a>
+        <button class="delete-btn" data-run="{{ run.run_id }}">🗑️ Delete</button>
+      </div>
     {% endfor %}
-    </div>
- </div>
-
+  </div>
+</div>
 
 <script>
   // ✅ 1. highlight=run_xxx 파라미터 파싱 및 카드 강조
@@ -64,21 +65,22 @@
         const statusElem = card.querySelector("h3");
         const progressElem = card.querySelector(".progress");
 
-        // 상태 표시 갱신
+        // Update status label
         if (data.status === "DONE") {
-          statusElem.textContent = "🟢 완료";
+          statusElem.textContent = "🟢 Completed";
         } else if (data.status === "FAILED") {
-          statusElem.textContent = "🔴 실패";
+          statusElem.textContent = "🔴 Failed";
         } else {
-          statusElem.textContent = "🟡 실행 중";
+          statusElem.textContent = "🟡 Running";
         }
 
-        // 진행률 갱신
+        // Update progress
         if (progressElem) {
-          progressElem.textContent = `진행: ${data.succeeded}/${data.total}`;
+          progressElem.textContent = `Progress: ${data.succeeded}/${data.total}`;
         }
       });
   }
+
 
   // ✅ 3. 모든 카드 반복해서 상태 polling
   function pollAllRuns() {

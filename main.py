@@ -26,7 +26,7 @@ app.mount("/results", StaticFiles(directory="results"), name="results")
 
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+    return templates.TemplateResponse("home.html", {"request": request})
 
 
 @app.get("/builder")
@@ -107,14 +107,6 @@ workflow.onComplete {
         total: workflow.stats.totalCount
     ]
     new File("${outdir}/status.json").text = groovy.json.JsonOutput.toJson(json)
-
-    // Also move report and timeline if they exist
-    ["report.html", "timeline.html"].each { fileName ->
-        def file = new File(fileName)
-        if (file.exists()) {
-            file.renameTo(new File("${outdir}/${fileName}"))
-        }
-    }
 }
 """
 
@@ -142,7 +134,7 @@ async def run_pipeline(
     user_name: Optional[str] = Form("unknown"),
     job_name: Optional[str] = Form("unnamed"),
     use_local: Optional[bool] = Form(False),
-    ligand_source: str = Form(...),
+    ligand_source: Optional[str] = Form(None),
     protein_path: Optional[str] = Form(None),
     ligand_path: Optional[str] = Form(None),
     ligand_files: Optional[List[UploadFile]] = File(None),
@@ -151,48 +143,48 @@ async def run_pipeline(
     # Parse module selection
     modules = json.loads(modules)
 
-    # Create directories
-    ligand_dir = Path(f"uploads/ligands/{ligand_source}")
-    protein_dir = Path("uploads/proteins")
-    ligand_dir.mkdir(parents=True, exist_ok=True)
-    protein_dir.mkdir(parents=True, exist_ok=True)
+    # # Create directories
+    # ligand_dir = Path(f"uploads/ligands/{ligand_source}")
+    # protein_dir = Path("uploads/proteins")
+    # ligand_dir.mkdir(parents=True, exist_ok=True)
+    # protein_dir.mkdir(parents=True, exist_ok=True)
 
-    saved_protein_files = []
-    saved_ligand_files = []
+    # saved_protein_files = []
+    # saved_ligand_files = []
 
-    # Save uploaded protein files
-    if protein_files:
-        for file in protein_files:
-            save_path = protein_dir / file.filename
-            save_path.write_bytes(await file.read())
-            saved_protein_files.append(save_path)
+    # # Save uploaded protein files
+    # if protein_files:
+    #     for file in protein_files:
+    #         save_path = protein_dir / file.filename
+    #         save_path.write_bytes(await file.read())
+    #         saved_protein_files.append(save_path)
 
-    # Save uploaded ligand files
-    if ligand_files:
-        for file in ligand_files:
-            save_path = ligand_dir / file.filename
-            save_path.write_bytes(await file.read())
-            saved_ligand_files.append(save_path)
+    # # Save uploaded ligand files
+    # if ligand_files:
+    #     for file in ligand_files:
+    #         save_path = ligand_dir / file.filename
+    #         save_path.write_bytes(await file.read())
+    #         saved_ligand_files.append(save_path)
 
-    # Resolve protein path
-    if saved_protein_files:
-        pdb_path = str(saved_protein_files[0])
-    elif protein_path:
-        pdb_path = protein_path
-    else:
-        if "proteinPrep" in modules:
-            return JSONResponse(status_code=400, content={"success": False, "message": "❌ Protein input is required for proteinPrep"})
-        pdb_path = None
+    # # Resolve protein path
+    # if saved_protein_files:
+    #     pdb_path = str(saved_protein_files[0])
+    # elif protein_path:
+    #     pdb_path = protein_path
+    # else:
+    #     if "proteinPrep" in modules:
+    #         return JSONResponse(status_code=400, content={"success": False, "message": "❌ Protein input is required for proteinPrep"})
+    #     pdb_path = None
 
-    # Resolve ligand path
-    if saved_ligand_files:
-        sdf_path = str(ligand_dir / "*.sdf")
-    elif ligand_path:
-        sdf_path = ligand_path
-    else:
-        if "fakeDocking" in modules:
-            return JSONResponse(status_code=400, content={"success": False, "message": "❌ Ligand input is required for fakeDocking"})
-        sdf_path = None
+    # # Resolve ligand path
+    # if saved_ligand_files:
+    #     sdf_path = str(ligand_dir / "*.sdf")
+    # elif ligand_path:
+    #     sdf_path = ligand_path
+    # else:
+    #     if "fakeDocking" in modules:
+    #         return JSONResponse(status_code=400, content={"success": False, "message": "❌ Ligand input is required for fakeDocking"})
+    #     sdf_path = None
 
     # Prepare run_id and result dir
     run_id = f"run_{uuid.uuid4()}"
@@ -212,14 +204,14 @@ async def run_pipeline(
     generate_main_nf(
         modules=modules,
         curate_path="/home/klgterry/curate",  # <- adjust if needed
-        sdf_path=sdf_path
+        #sdf_path=sdf_path
     )
 
     # Run Nextflow as background process with nohup
     nf_command = (
-        f"nohup nextflow run main_dynamic.nf "
-        f"-with-docker -with-report report.html -with-timeline timeline.html "
-        f"-name {run_id} > results/{run_id}/.nextflow.log 2>&1 &"
+        f"nextflow run main_dynamic.nf "
+        f"-with-docker -with-report {result_dir}/report.html -with-timeline {result_dir}/timeline.html "
+        f"-name {run_id} > {result_dir}/.nextflow.log 2>&1 &"
     )
 
     subprocess.Popen(nf_command, shell=True)
@@ -282,7 +274,7 @@ from fastapi import status
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-        content={"detail": exc.errors(), "body": exc.body},
+        content={"detail": exc.errors(), "body": str(exc.body)},
     )
 
 import time
@@ -359,3 +351,29 @@ def delete_run(run_id: str):
         return {"success": True, "message": f"{run_id} 삭제됨"}
     else:
         raise HTTPException(status_code=404, detail="해당 run_id 디렉토리가 존재하지 않습니다.")
+
+@app.get("/recent_runs")
+def get_recent_runs(n: int = 3):
+    from pathlib import Path
+    import os, json
+
+    results_dir = Path("./results")
+    runs = []
+
+    for run_dir in sorted(results_dir.glob("run_*"), key=os.path.getmtime, reverse=True)[:n]:
+        meta_file = run_dir / "metadata.json"
+        if not meta_file.exists():
+            continue
+
+        with open(meta_file) as f:
+            meta = json.load(f)
+
+        runs.append({
+            "run_id": meta.get("run_id", run_dir.name),
+            "status": "DONE",  # 또는 별도로 status 저장한 경우 반영
+            "user": meta.get("user", "unknown"),
+            "job_name": meta.get("job_name", "N/A"),
+            "start_time": meta.get("start_time", "N/A")
+        })
+
+    return runs

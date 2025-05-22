@@ -4,17 +4,14 @@
 
 {% block content %}
 <div class="results-container">
-  <h2>✅ HTVS Pipeline Execution Complete</h2>
+  <h2>✅ HTVS Protocol Pipeline Execution Complete</h2>
   <p>Your selected modules have been successfully executed.</p>
 
-  <h3>📥 Download Output</h3>
-  <a href="/results/ranked.csv" download>Download ranked.csv</a>
-
   <h3>📈 Execution Report</h3>
-  <iframe id="reportFrame" src="/results/{{ report_file }}" width="100%" style="border:1px solid #ccc;" onload="resizeIframe(this)"></iframe>
+  <iframe id="reportFrame" src="/results/{{ report_file }}" width="1200" style="border:1px solid #ccc; overflow: auto;" onload="resizeIframe(this)"></iframe>
 
   <h3>🕒 Timeline</h3>
-  <iframe id="timelineFrame" src="/results/{{ timeline_file }}" width="100%" style="border:1px solid #ccc;" onload="resizeIframe(this)"></iframe>
+  <iframe id="timelineFrame" src="/results/{{ timeline_file }}" width="1200" style="border:1px solid #ccc; overflow: auto;" onload="resizeIframe(this)"></iframe>
 
   <br>
   <a href="/builder"
@@ -37,8 +34,8 @@ function resizeIframe(iframe) {
 
 <style>
 .results-container {
-  max-width: 900px;
-  margin: 0 auto;
+  max-width: 1200px;
+  margin-left: 350px;
   padding: 0 20px;
 }
 </style>

@@ -1,148 +1,89 @@
-May-21 14:37:13.497 [main] DEBUG nextflow.cli.Launcher - $> nextflow run main_dynamic.nf -with-docker -with-report report.html -with-timeline timeline.html -name run_ccca69d9-8454-4c03-b923-bac133865868
-May-21 14:37:13.600 [main] DEBUG nextflow.cli.CmdRun - N E X T F L O W  ~  version 25.04.2
-May-21 14:37:13.620 [main] DEBUG nextflow.plugin.PluginsFacade - Setting up plugin manager > mode=prod; embedded=false; plugins-dir=/home/klgterry/.nextflow/plugins; core-plugins: nf-amazon@2.15.0,nf-azure@1.16.0,nf-cloudcache@0.4.3,nf-codecommit@0.2.3,nf-console@1.2.1,nf-google@1.21.0,nf-k8s@1.0.0,nf-tower@1.11.2,nf-wave@1.12.1
-May-21 14:37:13.646 [main] INFO  o.pf4j.DefaultPluginStatusProvider - Enabled plugins: []
-May-21 14:37:13.647 [main] INFO  o.pf4j.DefaultPluginStatusProvider - Disabled plugins: []
-May-21 14:37:13.650 [main] INFO  org.pf4j.DefaultPluginManager - PF4J version 3.12.0 in 'deployment' mode
-May-21 14:37:13.660 [main] INFO  org.pf4j.AbstractPluginManager - No plugins
-May-21 14:37:13.681 [main] DEBUG nextflow.config.ConfigBuilder - Found config local: /home/klgterry/htvs_fastapi_with_upload/nextflow.config
-May-21 14:37:13.683 [main] DEBUG nextflow.config.ConfigBuilder - Parsing config file: /home/klgterry/htvs_fastapi_with_upload/nextflow.config
-May-21 14:37:13.713 [main] DEBUG n.secret.LocalSecretsProvider - Secrets store: /home/klgterry/.nextflow/secrets/store.json
-May-21 14:37:13.717 [main] DEBUG nextflow.secret.SecretsLoader - Discovered secrets providers: [nextflow.secret.LocalSecretsProvider@48ea2003] - activable => nextflow.secret.LocalSecretsProvider@48ea2003
-May-21 14:37:13.723 [main] DEBUG nextflow.config.ConfigBuilder - Applying config profile: `standard`
-May-21 14:37:14.151 [main] DEBUG nextflow.config.ConfigBuilder - Enabling execution in Docker container as requested by command-line option `-with-docker -`
-May-21 14:37:14.169 [main] DEBUG nextflow.cli.CmdRun - Applied DSL=2 from script declaration
-May-21 14:37:14.181 [main] DEBUG nextflow.cli.CmdRun - Launching `main_dynamic.nf` [run_ccca69d9-8454-4c03-b923-bac133865868] DSL2 - revision: 3021ced7c8
-May-21 14:37:14.183 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins default=[]
-May-21 14:37:14.183 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins resolved requirement=[]
-May-21 14:37:14.241 [main] DEBUG nextflow.Session - Session UUID: 9e776216-1474-472f-9366-633d0f0d39a1
-May-21 14:37:14.241 [main] DEBUG nextflow.Session - Run name: run_ccca69d9-8454-4c03-b923-bac133865868
-May-21 14:37:14.241 [main] DEBUG nextflow.Session - Executor pool size: 48
-May-21 14:37:14.250 [main] DEBUG nextflow.file.FilePorter - File porter settings maxRetries=3; maxTransfers=50; pollTimeout=null
-May-21 14:37:14.255 [main] DEBUG nextflow.util.ThreadPoolBuilder - Creating thread pool 'FileTransfer' minSize=10; maxSize=144; workQueue=LinkedBlockingQueue[-1]; allowCoreThreadTimeout=false
-May-21 14:37:14.276 [main] DEBUG nextflow.cli.CmdRun - 
+May-21 16:06:04.753 [main] DEBUG nextflow.cli.Launcher - $> nextflow run main_dynamic.nf -with-docker -with-report report.html -with-timeline timeline.html -name run_73e17765-c21c-4920-be13-8ed90b86fd67
+May-21 16:06:04.896 [main] DEBUG nextflow.cli.CmdRun - N E X T F L O W  ~  version 25.04.2
+May-21 16:06:04.925 [main] DEBUG nextflow.plugin.PluginsFacade - Setting up plugin manager > mode=prod; embedded=false; plugins-dir=/home/klgterry/.nextflow/plugins; core-plugins: nf-amazon@2.15.0,nf-azure@1.16.0,nf-cloudcache@0.4.3,nf-codecommit@0.2.3,nf-console@1.2.1,nf-google@1.21.0,nf-k8s@1.0.0,nf-tower@1.11.2,nf-wave@1.12.1
+May-21 16:06:04.964 [main] INFO  o.pf4j.DefaultPluginStatusProvider - Enabled plugins: []
+May-21 16:06:04.966 [main] INFO  o.pf4j.DefaultPluginStatusProvider - Disabled plugins: []
+May-21 16:06:04.970 [main] INFO  org.pf4j.DefaultPluginManager - PF4J version 3.12.0 in 'deployment' mode
+May-21 16:06:04.986 [main] INFO  org.pf4j.AbstractPluginManager - No plugins
+May-21 16:06:05.017 [main] DEBUG nextflow.config.ConfigBuilder - Found config local: /home/klgterry/htvs_fastapi_with_upload/nextflow.config
+May-21 16:06:05.020 [main] DEBUG nextflow.config.ConfigBuilder - Parsing config file: /home/klgterry/htvs_fastapi_with_upload/nextflow.config
+May-21 16:06:05.077 [main] DEBUG n.secret.LocalSecretsProvider - Secrets store: /home/klgterry/.nextflow/secrets/store.json
+May-21 16:06:05.084 [main] DEBUG nextflow.secret.SecretsLoader - Discovered secrets providers: [nextflow.secret.LocalSecretsProvider@48ea2003] - activable => nextflow.secret.LocalSecretsProvider@48ea2003
+May-21 16:06:05.096 [main] DEBUG nextflow.config.ConfigBuilder - Applying config profile: `standard`
+May-21 16:06:05.792 [main] DEBUG nextflow.config.ConfigBuilder - Enabling execution in Docker container as requested by command-line option `-with-docker -`
+May-21 16:06:05.828 [main] DEBUG nextflow.cli.CmdRun - Applied DSL=2 from script declaration
+May-21 16:06:05.851 [main] DEBUG nextflow.cli.CmdRun - Launching `main_dynamic.nf` [run_73e17765-c21c-4920-be13-8ed90b86fd67] DSL2 - revision: f71c9ad98d
+May-21 16:06:05.853 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins default=[]
+May-21 16:06:05.854 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins resolved requirement=[]
+May-21 16:06:05.931 [main] DEBUG nextflow.Session - Session UUID: a48558a0-4164-4f06-bf2a-49babe9b6f47
+May-21 16:06:05.932 [main] DEBUG nextflow.Session - Run name: run_73e17765-c21c-4920-be13-8ed90b86fd67
+May-21 16:06:05.933 [main] DEBUG nextflow.Session - Executor pool size: 48
+May-21 16:06:05.948 [main] DEBUG nextflow.file.FilePorter - File porter settings maxRetries=3; maxTransfers=50; pollTimeout=null
+May-21 16:06:05.957 [main] DEBUG nextflow.util.ThreadPoolBuilder - Creating thread pool 'FileTransfer' minSize=10; maxSize=144; workQueue=LinkedBlockingQueue[-1]; allowCoreThreadTimeout=false
+May-21 16:06:05.989 [main] DEBUG nextflow.cli.CmdRun - 
   Version: 25.04.2 build 5947
   Created: 13-05-2025 21:58 UTC (14-05-2025 06:58 KDT)
   System: Linux 6.8.0-59-generic
   Runtime: Groovy 4.0.26 on OpenJDK 64-Bit Server VM 21.0.7+6-Ubuntu-0ubuntu124.04
   Encoding: UTF-8 (UTF-8)
-  Process: 3067542@node03 [127.0.1.1]
-  CPUs: 48 - Mem: 125.5 GB (28.1 GB) - Swap: 8 GB (8 GB)
-May-21 14:37:14.298 [main] DEBUG nextflow.Session - Work-dir: /home/klgterry/htvs_fastapi_with_upload/work [ext2/ext3]
-May-21 14:37:14.298 [main] DEBUG nextflow.Session - Script base path does not exist or is not a directory: /home/klgterry/htvs_fastapi_with_upload/bin
-May-21 14:37:14.308 [main] DEBUG nextflow.executor.ExecutorFactory - Extension executors providers=[]
-May-21 14:37:14.318 [main] DEBUG nextflow.Session - Observer factory: DefaultObserverFactory
-May-21 14:37:14.333 [main] DEBUG nextflow.Session - Observer factory (v2): LinObserverFactory
-May-21 14:37:14.360 [main] DEBUG nextflow.cache.CacheFactory - Using Nextflow cache factory: nextflow.cache.DefaultCacheFactory
-May-21 14:37:14.371 [main] DEBUG nextflow.util.CustomThreadPool - Creating default thread pool > poolSize: 49; maxThreads: 1000
-May-21 14:37:14.423 [main] DEBUG nextflow.Session - Session start
-May-21 14:37:14.573 [main] DEBUG nextflow.script.ScriptRunner - > Launching execution
-May-21 14:37:14.677 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:proteinPrep` matches process proteinPrep
-May-21 14:37:14.685 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
-May-21 14:37:14.685 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
-May-21 14:37:14.691 [main] DEBUG nextflow.executor.Executor - [warm up] executor > local
-May-21 14:37:14.698 [main] DEBUG n.processor.LocalPollingMonitor - Creating local task monitor for executor 'local' > cpus=48; memory=125.5 GB; capacity=48; pollInterval=100ms; dumpInterval=5m
-May-21 14:37:14.700 [main] DEBUG n.processor.TaskPollingMonitor - >>> barrier register (monitor: local)
-May-21 14:37:14.734 [main] DEBUG nextflow.processor.TaskProcessor - Creating process 'proteinPrep': maxForks=0; fair=false; array=0
-May-21 14:37:14.775 [main] DEBUG nextflow.Session - Workflow process names [dsl2]: proteinPrep
-May-21 14:37:14.777 [main] DEBUG nextflow.Session - Igniting dataflow network (2)
-May-21 14:37:14.783 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > proteinPrep
-May-21 14:37:14.785 [main] DEBUG nextflow.script.ScriptRunner - Parsed script files:
-  Script_591fc0131d617d46: /home/klgterry/htvs_fastapi_with_upload/main_dynamic.nf
-May-21 14:37:14.785 [main] DEBUG nextflow.script.ScriptRunner - > Awaiting termination 
-May-21 14:37:14.785 [main] DEBUG nextflow.Session - Session await
-May-21 14:37:15.031 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
-May-21 14:37:15.035 [Task submitter] INFO  nextflow.Session - [16/a39131] Submitted process > proteinPrep
-May-21 14:37:16.783 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 1; name: proteinPrep; status: COMPLETED; exit: 1; error: -; workDir: /home/klgterry/htvs_fastapi_with_upload/work/16/a39131f59eb5441b9e311cc7533f67]
-May-21 14:37:16.786 [Task monitor] DEBUG nextflow.util.ThreadPoolBuilder - Creating thread pool 'TaskFinalizer' minSize=10; maxSize=144; workQueue=LinkedBlockingQueue[-1]; allowCoreThreadTimeout=false
-May-21 14:37:16.806 [TaskFinalizer-1] DEBUG nextflow.processor.TaskProcessor - Handling unexpected condition for
-  task: name=proteinPrep; work-dir=/home/klgterry/htvs_fastapi_with_upload/work/16/a39131f59eb5441b9e311cc7533f67
-  error [nextflow.exception.ProcessFailedException]: Process `proteinPrep` terminated with an error exit status (1)
-May-21 14:37:16.840 [TaskFinalizer-1] ERROR nextflow.processor.TaskProcessor - Error executing process > 'proteinPrep'
-
-Caused by:
-  Process `proteinPrep` terminated with an error exit status (1)
-
-
-Command executed:
-
-  bash /curate.sh
-  
-  echo '▶ Copying output back into Nextflow work directory...'
-  rm -rf curate/protein_prep
-  mkdir -p curate
-  cp -r /curate/protein_prep curate/
-
-Command exit status:
-  1
-
-Command output:
-  
-  ==========
-  == CUDA ==
-  ==========
-  
-  CUDA Version 12.6.0
-  
-  Container image Copyright (c) 2016-2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
-  
-  This container image and its contents are governed by the NVIDIA Deep Learning Container License.
-  By pulling and using the container, you accept the terms and conditions of this license:
-  https://developer.nvidia.com/ngc/nvidia-deep-learning-container-license
-  
-  A copy of this license is made available in this container at /NGC-DL-CONTAINER-LICENSE for your convenience.
-  
-  WARNING: The NVIDIA Driver was not detected.  GPU functionality will not be available.
-     Use the NVIDIA Container Toolkit to start this container with GPU support; see
-     https://docs.nvidia.com/datacenter/cloud-native/ .
-
-Command error:
-  
-  ==========
-  == CUDA ==
-  ==========
-  
-  CUDA Version 12.6.0
-  
-  Container image Copyright (c) 2016-2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
-  
-  This container image and its contents are governed by the NVIDIA Deep Learning Container License.
-  By pulling and using the container, you accept the terms and conditions of this license:
-  https://developer.nvidia.com/ngc/nvidia-deep-learning-container-license
-  
-  A copy of this license is made available in this container at /NGC-DL-CONTAINER-LICENSE for your convenience.
-  
-  WARNING: The NVIDIA Driver was not detected.  GPU functionality will not be available.
-     Use the NVIDIA Container Toolkit to start this container with GPU support; see
-     https://docs.nvidia.com/datacenter/cloud-native/ .
-  
-  Traceback (most recent call last):
-    File "/protein_prep/protein_prep.py", line 48, in <module>
-      main()
-    File "/protein_prep/protein_prep.py", line 40, in main
-      min_pdb, rmsd = run_pipeline()
-    File "/protein_prep/protein_prep.py", line 8, in run_pipeline
-      param = parse_arguments()
-    File "/protein_prep/utils/init.py", line 9, in parse_arguments
-      template_pdb = config["protein_prep"]["template_pdb"]
-    File "/root/miniconda3/envs/protein_prep/lib/python3.10/configparser.py", line 965, in __getitem__
-      raise KeyError(key)
-  KeyError: 'protein_prep'
-
-Work dir:
-  /home/klgterry/htvs_fastapi_with_upload/work/16/a39131f59eb5441b9e311cc7533f67
-
-Container:
-  protein_prep:1.0.2
-
-Tip: you can try to figure out what's wrong by changing to the process work dir and showing the script file named `.command.sh`
-May-21 14:37:16.853 [main] DEBUG nextflow.Session - Session await > all processes finished
-May-21 14:37:16.888 [TaskFinalizer-1] DEBUG nextflow.Session - Session aborted -- Cause: Process `proteinPrep` terminated with an error exit status (1)
-May-21 14:37:16.903 [Task monitor] DEBUG n.processor.TaskPollingMonitor - <<< barrier arrives (monitor: local) - terminating tasks monitor poll loop
-May-21 14:37:16.903 [main] DEBUG nextflow.Session - Session await > all barriers passed
-May-21 14:37:16.914 [TaskFinalizer-1] WARN  nextflow.util.SimpleAgent - Got an interrupted exception while taking agent result | java.lang.InterruptedException
-May-21 14:37:16.925 [main] DEBUG n.trace.WorkflowStatsObserver - Workflow completed > WorkflowStats[succeededCount=0; failedCount=1; ignoredCount=0; cachedCount=0; pendingCount=0; submittedCount=0; runningCount=0; retriesCount=0; abortedCount=0; succeedDuration=0ms; failedDuration=1.6s; cachedDuration=0ms;loadCpus=0; loadMemory=0; peakRunning=1; peakCpus=1; peakMemory=0; ]
-May-21 14:37:16.926 [main] DEBUG nextflow.trace.ReportObserver - Workflow completed -- rendering execution report
-May-21 14:37:17.701 [main] DEBUG nextflow.trace.TimelineObserver - Workflow completed -- rendering execution timeline
-May-21 14:37:17.775 [main] DEBUG nextflow.cache.CacheDB - Closing CacheDB done
-May-21 14:37:17.791 [main] DEBUG nextflow.script.ScriptRunner - > Execution complete -- Goodbye
+  Process: 3169244@node03 [127.0.1.1]
+  CPUs: 48 - Mem: 125.5 GB (36.5 GB) - Swap: 8 GB (8 GB)
+May-21 16:06:06.031 [main] DEBUG nextflow.Session - Work-dir: /home/klgterry/htvs_fastapi_with_upload/work [ext2/ext3]
+May-21 16:06:06.032 [main] DEBUG nextflow.Session - Script base path does not exist or is not a directory: /home/klgterry/htvs_fastapi_with_upload/bin
+May-21 16:06:06.050 [main] DEBUG nextflow.executor.ExecutorFactory - Extension executors providers=[]
+May-21 16:06:06.067 [main] DEBUG nextflow.Session - Observer factory: DefaultObserverFactory
+May-21 16:06:06.092 [main] DEBUG nextflow.Session - Observer factory (v2): LinObserverFactory
+May-21 16:06:06.139 [main] DEBUG nextflow.cache.CacheFactory - Using Nextflow cache factory: nextflow.cache.DefaultCacheFactory
+May-21 16:06:06.157 [main] DEBUG nextflow.util.CustomThreadPool - Creating default thread pool > poolSize: 49; maxThreads: 1000
+May-21 16:06:06.246 [main] DEBUG nextflow.Session - Session start
+May-21 16:06:06.256 [main] DEBUG nextflow.Session - Report file already exists: /home/klgterry/htvs_fastapi_with_upload/report.html -- enable the 'report.overwrite' option in your config file to overwrite existing files
+nextflow.exception.AbortOperationException: Report file already exists: /home/klgterry/htvs_fastapi_with_upload/report.html -- enable the 'report.overwrite' option in your config file to overwrite existing files
+	at nextflow.trace.ReportObserver.onFlowCreate(ReportObserver.groovy:133)
+	at nextflow.Session$_notifyFlowCreate_lambda40.doCall(Session.groovy:1093)
+	at nextflow.Session.notifyEvent(Session.groovy:1138)
+	at nextflow.Session.notifyFlowCreate(Session.groovy:1093)
+	at nextflow.Session.start(Session.groovy:585)
+	at nextflow.script.ScriptRunner.execute(ScriptRunner.groovy:133)
+	at nextflow.cli.CmdRun.run(CmdRun.groovy:379)
+	at nextflow.cli.Launcher.run(Launcher.groovy:513)
+	at nextflow.cli.Launcher.main(Launcher.groovy:673)
+May-21 16:06:06.258 [main] DEBUG nextflow.Session - Timeline file already exists: /home/klgterry/htvs_fastapi_with_upload/timeline.html -- enable the 'timeline.overwrite' option in your config file to overwrite existing files
+nextflow.exception.AbortOperationException: Timeline file already exists: /home/klgterry/htvs_fastapi_with_upload/timeline.html -- enable the 'timeline.overwrite' option in your config file to overwrite existing files
+	at nextflow.trace.TimelineObserver.onFlowCreate(TimelineObserver.groovy:76)
+	at nextflow.Session$_notifyFlowCreate_lambda40.doCall(Session.groovy:1093)
+	at nextflow.Session.notifyEvent(Session.groovy:1138)
+	at nextflow.Session.notifyFlowCreate(Session.groovy:1093)
+	at nextflow.Session.start(Session.groovy:585)
+	at nextflow.script.ScriptRunner.execute(ScriptRunner.groovy:133)
+	at nextflow.cli.CmdRun.run(CmdRun.groovy:379)
+	at nextflow.cli.Launcher.run(Launcher.groovy:513)
+	at nextflow.cli.Launcher.main(Launcher.groovy:673)
+May-21 16:06:06.637 [main] DEBUG nextflow.script.ScriptRunner - > Launching execution
+May-21 16:06:06.775 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:proteinPrep` matches process proteinPrep
+May-21 16:06:06.785 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+May-21 16:06:06.785 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+May-21 16:06:06.792 [main] DEBUG nextflow.executor.Executor - [warm up] executor > local
+May-21 16:06:06.801 [main] DEBUG n.processor.LocalPollingMonitor - Creating local task monitor for executor 'local' > cpus=48; memory=125.5 GB; capacity=48; pollInterval=100ms; dumpInterval=5m
+May-21 16:06:06.803 [main] DEBUG n.processor.TaskPollingMonitor - >>> barrier register (monitor: local)
+May-21 16:06:06.832 [main] DEBUG nextflow.processor.TaskProcessor - Creating process 'proteinPrep': maxForks=0; fair=false; array=0
+May-21 16:06:06.882 [main] DEBUG nextflow.Session - Workflow process names [dsl2]: proteinPrep
+May-21 16:06:06.886 [main] DEBUG nextflow.Session - Igniting dataflow network (2)
+May-21 16:06:06.892 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > proteinPrep
+May-21 16:06:06.894 [main] DEBUG nextflow.script.ScriptRunner - Parsed script files:
+  Script_727984d1b40ebc52: /home/klgterry/htvs_fastapi_with_upload/main_dynamic.nf
+May-21 16:06:06.894 [main] DEBUG nextflow.script.ScriptRunner - > Awaiting termination 
+May-21 16:06:06.894 [main] DEBUG nextflow.Session - Session await
+May-21 16:06:07.116 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+May-21 16:06:07.120 [Task submitter] INFO  nextflow.Session - [ee/3f28f0] Submitted process > proteinPrep
+May-21 16:08:11.605 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 1; name: proteinPrep; status: COMPLETED; exit: 0; error: -; workDir: /home/klgterry/htvs_fastapi_with_upload/work/ee/3f28f0e580062955aa77617bd00044]
+May-21 16:08:11.610 [Task monitor] DEBUG nextflow.util.ThreadPoolBuilder - Creating thread pool 'TaskFinalizer' minSize=10; maxSize=144; workQueue=LinkedBlockingQueue[-1]; allowCoreThreadTimeout=false
+May-21 16:08:11.665 [main] DEBUG nextflow.Session - Session await > all processes finished
+May-21 16:08:11.695 [Task monitor] DEBUG n.processor.TaskPollingMonitor - <<< barrier arrives (monitor: local) - terminating tasks monitor poll loop
+May-21 16:08:11.695 [main] DEBUG nextflow.Session - Session await > all barriers passed
+May-21 16:08:11.725 [main] DEBUG nextflow.util.ThreadPoolManager - Thread pool 'TaskFinalizer' shutdown completed (hard=false)
+May-21 16:08:11.766 [main] DEBUG n.trace.WorkflowStatsObserver - Workflow completed > WorkflowStats[succeededCount=1; failedCount=0; ignoredCount=0; cachedCount=0; pendingCount=0; submittedCount=0; runningCount=0; retriesCount=0; abortedCount=0; succeedDuration=2m 2s; failedDuration=0ms; cachedDuration=0ms;loadCpus=0; loadMemory=0; peakRunning=1; peakCpus=1; peakMemory=0; ]
+May-21 16:08:11.767 [main] DEBUG nextflow.trace.ReportObserver - Workflow completed -- rendering execution report
+May-21 16:08:12.806 [main] DEBUG nextflow.trace.TimelineObserver - Workflow completed -- rendering execution timeline
+May-21 16:08:13.117 [main] DEBUG nextflow.cache.CacheDB - Closing CacheDB done
+May-21 16:08:13.138 [main] DEBUG nextflow.util.ThreadPoolManager - Thread pool 'FileTransfer' shutdown completed (hard=false)
+May-21 16:08:13.140 [main] DEBUG nextflow.script.ScriptRunner - > Execution complete -- Goodbye

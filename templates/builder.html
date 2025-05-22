@@ -155,12 +155,10 @@
 <div class="step-container">
     <!-- System Monitor Panel -->
     <div class="step-box" style="flex: 1; min-width: 320px; padding: 16px;">
-
         <h3>🖥️ Cluster Node Status</h3>
         <div id="node-status-container"
             style="display: flex; flex-wrap: wrap; justify-content: center; gap: 16px;">
         </div>
-
     </div>
 
     <!-- Step 1: Choose Modules -->
@@ -187,8 +185,8 @@
     </div>
 
     <!-- Step 3: Upload -->
-    <div class="step-box">
-        <h3>📁 Step 3: Upload Files</h3>
+    <!-- <div class="step-box"> -->
+        <!-- <h3>📁 Step 3: Upload Files</h3>
 
         <label style="font-weight: 600; color: #003366; font-size: 18px; margin-bottom: 12px; display: block;">
             Ligand Source
@@ -202,26 +200,26 @@
 
         <label style="font-weight: 600; color: #003366; font-size: 18px; margin-bottom: 12px; display: block;">
             Ligand Files (.sdf)
-        </label>
+        </label> -->
         <!-- Upload mode toggle -->
-        <div style="margin-bottom: 12px;">
+        <!-- <div style="margin-bottom: 12px;">
             <label><input type="radio" name="ligand-mode" value="upload" checked onchange="toggleLigandMode()"> Upload
                 File</label>
             <label style="margin-left: 20px;"><input type="radio" name="ligand-mode" value="path"
                                                      onchange="toggleLigandMode()"> Use Server Path</label>
-        </div>
+        </div> -->
 
         <!-- Upload input -->
-        <div id="ligand-upload-area">
+        <!-- <div id="ligand-upload-area">
             <div class="drop-zone" id="ligand-drop">
                 <span>📂 Drag & Drop ligand files here, or click to select</span>
                 <input type="file" id="ligand-input" multiple>
             </div>
             <ul id="ligand-file-list" class="file-list"></ul>
-        </div>
+        </div> -->
 
         <!-- Server path input -->
-        <div id="ligand-path-area" style="display: none;">
+        <!-- <div id="ligand-path-area" style="display: none;">
             <input type="text" id="ligand-path" placeholder="/mnt/data/kcb/ligands.sdf"
                    style="width: 100%; padding: 8px; font-size: 14px; border-radius: 6px; border: 1px solid #ccc;">
         </div>
@@ -229,36 +227,36 @@
 
         <label style="font-weight: 600; color: #003366; font-size: 18px; margin-bottom: 12px; display: block;">
             Protein Files (.pdb)
-        </label>
+        </label> -->
 
         <!-- Upload mode toggle -->
-        <div style="margin-bottom: 12px;">
+        <!-- <div style="margin-bottom: 12px;">
             <label><input type="radio" name="protein-mode" value="upload" checked onchange="toggleProteinMode()"> Upload
                 File</label>
             <label style="margin-left: 20px;"><input type="radio" name="protein-mode" value="path"
                                                      onchange="toggleProteinMode()"> Use Server Path</label>
-        </div>
+        </div> -->
 
         <!-- Upload input -->
-        <div id="protein-upload-area">
+        <!-- <div id="protein-upload-area">
             <div class="drop-zone" id="protein-drop">
                 <span>📂 Drag & Drop protein files here, or click to select</span>
                 <input type="file" id="protein-input" multiple>
             </div>
             <ul id="protein-file-list" class="file-list"></ul>
-        </div>
+        </div> -->
 
         <!-- Server path input -->
-        <div id="protein-path-area" style="display: none;">
+        <!-- <div id="protein-path-area" style="display: none;">
             <input type="text" id="protein-path" placeholder="/mnt/data/proteins/receptor.pdb"
                    style="width: 100%; padding: 8px; font-size: 14px; border-radius: 6px; border: 1px solid #ccc;">
-        </div>
+        </div> -->
 
-    </div>
+    <!-- </div> -->
 
     <!-- Step 4: Slurm Settings -->
     <div class="step-box">
-        <h3>⚙️ Step 4: Slurm Settings</h3>
+        <h3>⚙️ Step 3: Slurm Settings</h3>
 
         <!-- ✅ User Name -->
         <label class="upload-label">User Name</label>
@@ -359,8 +357,8 @@
       });
     }
 
-    setupDropZone("ligand-drop", "ligand-input", "ligand-file-list", ligandFiles);
-    setupDropZone("protein-drop", "protein-input", "protein-file-list", proteinFiles);
+    //setupDropZone("ligand-drop", "ligand-input", "ligand-file-list", ligandFiles);
+    //setupDropZone("protein-drop", "protein-input", "protein-file-list", proteinFiles);
 
     new Sortable(document.getElementById("module-panel"), {
       group: { name: 'modules', pull: 'clone', put: false },
@@ -406,22 +404,22 @@
       formData.append("slurm_gres", document.getElementById("slurm-gres").value);
       formData.append("slurm_output", document.getElementById("slurm-output").value);
 
-      formData.append("ligand_source", document.getElementById("ligand-source").value);
-      const ligandMode = document.querySelector('input[name="ligand-mode"]:checked').value;
+      // formData.append("ligand_source", document.getElementById("ligand-source").value);
+      // const ligandMode = document.querySelector('input[name="ligand-mode"]:checked').value;
 
-        if (ligandMode === "upload") {
-          ligandFiles.forEach(file => formData.append("ligand_files", file));
-        } else if (ligandMode === "path") {
-          formData.append("ligand_path", document.getElementById("ligand-path").value);
-        }
+      //   if (ligandMode === "upload") {
+      //     ligandFiles.forEach(file => formData.append("ligand_files", file));
+      //   } else if (ligandMode === "path") {
+      //     formData.append("ligand_path", document.getElementById("ligand-path").value);
+      //   }
 
-        const proteinMode = document.querySelector('input[name="protein-mode"]:checked').value;
+      //   const proteinMode = document.querySelector('input[name="protein-mode"]:checked').value;
 
-        if (proteinMode === "upload") {
-          proteinFiles.forEach(file => formData.append("protein_files", file));
-        } else if (proteinMode === "path") {
-          formData.append("protein_path", document.getElementById("protein-path").value);
-        }
+      //   if (proteinMode === "upload") {
+      //     proteinFiles.forEach(file => formData.append("protein_files", file));
+      //   } else if (proteinMode === "path") {
+      //     formData.append("protein_path", document.getElementById("protein-path").value);
+      //   }
 
       formData.append("modules", JSON.stringify(steps));
 
@@ -449,14 +447,14 @@
     }
 
     function resetBuilder() {
-      document.getElementById("ligand-source").value = "None";
+      //document.getElementById("ligand-source").value = "None";
       ligandFiles.length = 0;
       proteinFiles.length = 0;
-      document.getElementById("ligand-file-list").innerHTML = "";
-      document.getElementById("protein-file-list").innerHTML = "";
-      document.getElementById("ligand-input").value = "";
-      document.getElementById("protein-input").value = "";
-      document.getElementById("workflow-canvas").innerHTML = "";
+      //document.getElementById("ligand-file-list").innerHTML = "";
+      //document.getElementById("protein-file-list").innerHTML = "";
+      //document.getElementById("ligand-input").value = "";
+      //document.getElementById("protein-input").value = "";
+      //document.getElementById("workflow-canvas").innerHTML = "";
 
       resetSlurmInputs();
     }
@@ -618,12 +616,12 @@ function initNodeCards() {
       background: white;
       border-radius: 12px;
       padding: 16px;
-      width: 280px;
+      width: 400px;
       font-family: Inter, sans-serif;
       box-shadow: 0 4px 10px rgba(0,0,0,0.05);
       transition: transform 0.2s ease;
     `;
-    card.innerHTML = `<strong>🔄 ${name} 로딩 중...</strong>`;
+    card.innerHTML = `<strong>🔄 ${name} loading...</strong>`;
     container.appendChild(card);
   });
 }
@@ -639,7 +637,7 @@ function updateNodeData() {
                       data.cpu_percent > 50 ? "#f1c40f" : "#2ecc71";
 
         const html = `
-          <div style="font-weight: 700; color: #003366;">🖥️ ${name} (${data.host})</div>
+          <div style="font-weight: 700; color: #003366;">🖥️ ${data.host}</div>
           <div style="margin-top: 6px;">
             CPU: ${data.cpu_percent}% (${data.cpu_count} cores)<br>
             Mem: ${data.mem_used} / ${data.mem_total} GB<br>
@@ -654,7 +652,7 @@ function updateNodeData() {
 
         const card = document.getElementById(`node-card-${name}`);
         if (card) card.innerHTML = `<div style="font-weight: 700; color: #003366; font-size: 16px; margin-bottom: 8px;">
-            🖥️ ${name} (${data.host})
+            🖥️ ${data.host}
           </div>
           <hr style="border-top: 1px solid #ddd; margin: 8px 0;">
           <div style="line-height: 1.8; font-size: 14px; color: #333;">
@@ -689,10 +687,8 @@ function updateNodeData() {
 
 // ✅ 실행
 initNodeCards();
-updateNodeData();
+setTimeout(updateNodeData, 100);  // 약간 지연 실행
 setInterval(updateNodeData, 5000);
-
-
 
 </script>
 {% endblock %}
