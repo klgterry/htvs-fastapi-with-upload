@@ -78,7 +78,7 @@ def generate_main_nf(modules: list[str], curate_path: str = None, sdf_path: str 
     channels = []
     if "proteinPrep" in modules and curate_path:
         channels.append(f"curate_dir = Channel.fromPath('{curate_path}')")
-    if "fakeDocking" in modules and sdf_path:
+    if "dockingSim" in modules and sdf_path:
         channels.append(f"ligand_file = Channel.fromPath('{sdf_path}')")
     channel_block = "\n".join(channels) + "\n\n"
 
@@ -86,14 +86,30 @@ def generate_main_nf(modules: list[str], curate_path: str = None, sdf_path: str 
     script = ""
     workflow = "workflow {\n"
     if "proteinPrep" in modules:
-        script += Path("dynamic_templates/proteinPrep.nf").read_text()
+        script += Path("dynamic_templates/proteinPrep.nf").read_text() + "\n\n"
         workflow += "    proteinPrep()\n"
-    if "fakeDocking" in modules:
-        script += Path("dynamic_templates/fakeDocking.nf").read_text()
-        workflow += "    docking = fakeDocking(ligand_file)\n"
+    if "dockingSim" in modules:
+        script += Path("dynamic_templates/dockingSim.nf").read_text() + "\n\n"
+        workflow += "    dockingSim()\n"
     if "ranking" in modules:
         script += Path("dynamic_templates/ranking.nf").read_text()
         workflow += "    ranking(docking.dock_out)\n"
+    if "scaffoldDelete" in modules:
+        script += Path("dynamic_templates/scaffoldDelete.nf").read_text() + "\n\n"
+        workflow += "    scaffoldDelete()\n"
+    if "reinventLinker" in modules:
+        script += Path("dynamic_templates/reinventLinker.nf").read_text() + "\n\n"
+        workflow += "    reinventLinker()\n"
+    if "reinventDenovo" in modules:
+        script += Path("dynamic_templates/reinventDenovo.nf").read_text() + "\n\n"
+        workflow += "    reinventDenovo()\n"
+    if "reinventMolopt" in modules:
+        script += Path("dynamic_templates/reinventMolopt.nf").read_text() + "\n\n"
+        workflow += "    reinventMolopt()\n"
+    if "reinventScaffold" in modules:
+        script += Path("dynamic_templates/reinventScaffold.nf").read_text() + "\n\n"
+        workflow += "    reinventScaffold()\n"
+
     workflow += "}\n\n"
 
     # Final block: status.json + report/timeline 이동
@@ -182,8 +198,8 @@ async def run_pipeline(
     # elif ligand_path:
     #     sdf_path = ligand_path
     # else:
-    #     if "fakeDocking" in modules:
-    #         return JSONResponse(status_code=400, content={"success": False, "message": "❌ Ligand input is required for fakeDocking"})
+    #     if "dockingSim" in modules:
+    #         return JSONResponse(status_code=400, content={"success": False, "message": "❌ Ligand input is required for dockingSim"})
     #     sdf_path = None
 
     # Prepare run_id and result dir

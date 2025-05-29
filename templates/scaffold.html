@@ -3,9 +3,690 @@
 {% block title %}Scaffold Hopping – AIDD{% endblock %}
 
 {% block content %}
-<h1>🧱 Scaffold Hopping</h1>
-<p style="font-size: 18px; margin-top: 20px;">
-    이 기능은 현재 <strong>준비 중입니다</strong>.
-    곧 다양한 scaffold 기반 molecular optimization 기능이 제공될 예정입니다.
-</p>
+<style>
+    .step-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: flex-start;
+        gap: 24px;
+        margin: 40px auto;
+        max-width: 2000px;
+        padding: 0 20px;
+        box-sizing: border-box;
+      }
+
+      .step-box {
+        flex: 1;
+        min-width: 280px;
+        max-width: 400px;
+        height: 800px;
+        overflow-y: auto;
+        padding: 16px;
+        border: 2px dashed #ccc;
+        border-radius: 10px;
+        background-color: #f9f9f9;
+      }
+
+    .step-box h3 {
+      margin-bottom: 16px;
+      color: #003366;
+    }
+    .drop-zone {
+      border: 2px dashed #007acc;
+      padding: 12px;
+      border-radius: 10px;
+      text-align: center;
+      background-color: #f0f8ff;
+      color: #003366;
+      font-weight: 600;
+      margin-bottom: 16px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    .drop-zone.dragover {
+      background-color: #d0e9ff;
+      border-color: #005fa3;
+    }
+    .drop-zone input[type="file"] {
+      display: none;
+    }
+    .file-list {
+      font-size: 16px;
+      color: #333;
+      max-height: 220px;
+      overflow-y: auto;
+      margin-bottom: 20px;
+    }
+    .file-list li {
+      padding: 12px 12px;
+      font-size: 16px;
+      font-weight: 500;
+      border-radius: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #fff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+      margin-bottom: 10px;
+    }
+    .file-remove {
+      margin-left: 12px;
+      color: red;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    #workflow-canvas {
+      counter-reset: step; /* ✅ 꼭 필요함 */
+    }
+
+    #workflow-canvas li {
+      background-color: #ffffff;
+      border-left: 5px solid #007acc;
+      padding: 12px 18px;
+      margin-bottom: 12px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 500;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      cursor: grab;
+      transition: background 0.2s ease;
+    }
+    #workflow-canvas li::before {
+      counter-increment: step;
+      content: "Step " counter(step) ": ";
+      font-weight: bold;
+      margin-right: 6px;
+      color: #006699;
+    }
+    #module-panel li {
+      background-color: #ffffff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      cursor: grab;
+      transition: background-color 0.2s ease;
+    }
+    #module-panel li:hover {
+      background-color: #f0f8ff;
+    }
+
+    @media (max-width: 1024px) {
+      .step-box {
+        max-width: 100%;
+        min-width: 90%;
+      }
+    }
+
+</style>
+
+
+<script>
+    function updateSystemStatus() {
+      fetch("/system/status")
+        .then(res => res.json())
+        .then(data => {
+          const color = data.cpu_percent > 80 ? "#e74c3c" : (data.cpu_percent > 50 ? "#f1c40f" : "#2ecc71");
+          document.getElementById("node-status-row").innerHTML = `
+            <div style="line-height: 1.6;">
+              <div style="font-weight: 600; color: #003366;">🖥️ ${data.host}</div>
+              <div style="margin-top: 4px;">
+                CPU: ${data.cpu_percent}% &nbsp;|&nbsp;
+                Mem: ${data.mem_used} / ${data.mem_total} GB &nbsp;|&nbsp;
+                GPU: ${data.gpu_usage}
+                <span style="display: inline-block; margin-top: 6px; padding: 4px 8px; background: ${color}; color: white; border-radius: 4px; font-size: 12px;">
+                ${data.cpu_percent > 80 ? "Busy" : data.cpu_percent > 50 ? "Moderate" : "Idle"}
+              </span>
+              </div>
+            </div>
+          `;
+        });
+    }
+    updateSystemStatus();
+    setInterval(updateSystemStatus, 3000);
+</script>
+
+
+<h2 style="text-align:center">🧬 Build Your Scaffold Hopping Workflow</h2>
+
+<div class="step-container">
+    <!-- System Monitor Panel -->
+    <div class="step-box" style="flex: 1; min-width: 320px; padding: 16px;">
+        <h3>🖥️ Cluster Node Status</h3>
+        <div id="node-status-container"
+            style="display: flex; flex-wrap: wrap; justify-content: center; gap: 16px;">
+        </div>
+    </div>
+
+    <!-- Step 1: Choose Modules -->
+    <div class="step-box">
+        <h3>📦 Step 1: Choose Modules</h3>
+        <ul id="module-panel"
+            style="list-style: none; padding: 10px; min-height: 725px; border: 2px dashed #ccc; border-radius: 10px; background-color: #fff;">
+            <li data-module="scaffoldDelete">🧪 scaffoldDelete</li>
+        </ul>
+    </div>
+
+    <!-- Step 2: Build Pipeline -->
+    <div class="step-box">
+        <h3>🧱 Step 2: Build Your Pipeline</h3>
+        <ul id="workflow-canvas"
+            style="list-style: none; padding: 10px; min-height: 655px; border: 2px dashed #ccc; border-radius: 10px; background-color: #fff;"></ul>
+        <div id="trash" title="Drop here to delete" style="font-size: 28px; width: 40px; height: 40px; border-radius: 6px;
+      background: #fff0f0; border: 2px dashed #e55;
+      display: flex; justify-content: center; align-items: center;
+      cursor: pointer; margin-top: 20px;">🗑️
+        </div>
+    </div>
+
+    <!-- Step 3: Upload -->
+    <!-- <div class="step-box"> -->
+        <!-- <h3>📁 Step 3: Upload Files</h3>
+
+        <label style="font-weight: 600; color: #003366; font-size: 18px; margin-bottom: 12px; display: block;">
+            Ligand Source
+        </label>
+        <select id="ligand-source" style="width: 100%; height: 40px; margin-bottom: 20px; font-size: 16px;">
+            <option value="None">None</option>
+            <option value="KCB">KCB</option>
+            <option value="eMolecule">eMolecule</option>
+            <option value="Enamine">Enamine</option>
+        </select>
+
+        <label style="font-weight: 600; color: #003366; font-size: 18px; margin-bottom: 12px; display: block;">
+            Ligand Files (.sdf)
+        </label> -->
+        <!-- Upload mode toggle -->
+        <!-- <div style="margin-bottom: 12px;">
+            <label><input type="radio" name="ligand-mode" value="upload" checked onchange="toggleLigandMode()"> Upload
+                File</label>
+            <label style="margin-left: 20px;"><input type="radio" name="ligand-mode" value="path"
+                                                     onchange="toggleLigandMode()"> Use Server Path</label>
+        </div> -->
+
+        <!-- Upload input -->
+        <!-- <div id="ligand-upload-area">
+            <div class="drop-zone" id="ligand-drop">
+                <span>📂 Drag & Drop ligand files here, or click to select</span>
+                <input type="file" id="ligand-input" multiple>
+            </div>
+            <ul id="ligand-file-list" class="file-list"></ul>
+        </div> -->
+
+        <!-- Server path input -->
+        <!-- <div id="ligand-path-area" style="display: none;">
+            <input type="text" id="ligand-path" placeholder="/mnt/data/kcb/ligands.sdf"
+                   style="width: 100%; padding: 8px; font-size: 14px; border-radius: 6px; border: 1px solid #ccc;">
+        </div>
+
+
+        <label style="font-weight: 600; color: #003366; font-size: 18px; margin-bottom: 12px; display: block;">
+            Protein Files (.pdb)
+        </label> -->
+
+        <!-- Upload mode toggle -->
+        <!-- <div style="margin-bottom: 12px;">
+            <label><input type="radio" name="protein-mode" value="upload" checked onchange="toggleProteinMode()"> Upload
+                File</label>
+            <label style="margin-left: 20px;"><input type="radio" name="protein-mode" value="path"
+                                                     onchange="toggleProteinMode()"> Use Server Path</label>
+        </div> -->
+
+        <!-- Upload input -->
+        <!-- <div id="protein-upload-area">
+            <div class="drop-zone" id="protein-drop">
+                <span>📂 Drag & Drop protein files here, or click to select</span>
+                <input type="file" id="protein-input" multiple>
+            </div>
+            <ul id="protein-file-list" class="file-list"></ul>
+        </div> -->
+
+        <!-- Server path input -->
+        <!-- <div id="protein-path-area" style="display: none;">
+            <input type="text" id="protein-path" placeholder="/mnt/data/proteins/receptor.pdb"
+                   style="width: 100%; padding: 8px; font-size: 14px; border-radius: 6px; border: 1px solid #ccc;">
+        </div> -->
+
+    <!-- </div> -->
+
+    <!-- Step 4: Slurm Settings -->
+    <div class="step-box">
+        <h3>⚙️ Step 3: Slurm Settings</h3>
+
+        <!-- ✅ User Name -->
+        <label class="upload-label">User Name</label>
+        <input type="text" id="user-name" value="klgterry" placeholder="e.g., klgterry" style="width: 100%; margin-bottom: 12px;">
+
+        <!-- ✅ Job Name (항상 활성) -->
+        <label class="upload-label">Job Name</label>
+        <input type="text" id="slurm-jobname" placeholder="e.g., my-htvs-run" style="width: 100%; margin-bottom: 12px;">
+
+        <!-- ✅ Run Locally toggle -->
+        <div style="margin-bottom: 12px;">
+          <label><input type="checkbox" id="use-local-checkbox" onchange="toggleLocalMode()"> 🖥️ Run Locally (no Slurm)</label>
+        </div>
+
+        <label class="upload-label">CPU cores</label>
+        <input type="number" id="slurm-cpus" value="4" min="1" max="64" style="width: 100%; margin-bottom: 12px;">
+
+        <label class="upload-label">Memory (GB)</label>
+        <input type="number" id="slurm-mem" value="8" min="1" max="512" style="width: 100%; margin-bottom: 12px;">
+
+        <label class="upload-label">Time Limit</label>
+        <input type="text" id="slurm-time" value="02:00:00" style="width: 100%; margin-bottom: 12px;">
+
+        <label class="upload-label">Partition (Optional)</label>
+        <input type="text" id="slurm-partition" placeholder="e.g., gpu" style="width: 100%; margin-bottom: 12px;">
+
+        <label class="upload-label">Node Name (Optional)</label>
+        <input type="text" id="slurm-nodelist" placeholder="e.g., node01" style="width: 100%; margin-bottom: 12px;">
+
+        <label class="upload-label">GPU Setting (Optional)</label>
+        <input type="text" id="slurm-gres" placeholder="e.g., gpu:1" style="width: 100%; margin-bottom: 12px;">
+
+        <label class="upload-label">Output Log File</label>
+        <input type="text" id="slurm-output" placeholder="e.g., logs/out_%j.log"
+               style="width: 100%; margin-bottom: 12px;">
+        <button onclick="toggleSlurmSettings()" id="confirm-slurm-btn"
+                style="margin-top: 10px; padding: 8px 16px; background: #007acc; color: white; border: none;
+               border-radius: 6px; font-size: 14px;">
+            🔒 Confirm Slurm Settings
+        </button>
+    </div>
+</div>
+
+<div style="text-align: center; margin-top: 40px; margin-bottom: 80px;">
+    <button onclick="resetBuilder()"
+            style="margin-right: 10px; padding: 10px 20px; background: #cccccc; color: #000; border: none; border-radius: 6px; font-size: 16px;">
+        🔄 Reset
+    </button>
+    <button onclick="submitModules()"
+            style="padding: 10px 20px; background: #007acc; color: white; border: none; border-radius: 6px; font-size: 16px;">
+        🚀 Run Pipeline
+    </button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+<script>
+    const canvas = document.getElementById("workflow-canvas");
+    const ligandFiles = [], proteinFiles = [];
+
+    function renderFileList(files, listElement) {
+      listElement.innerHTML = "";
+      files.forEach((file, index) => {
+        const li = document.createElement("li");
+        li.textContent = file.name;
+        const remove = document.createElement("span");
+        remove.textContent = " ❌";
+        remove.classList.add("file-remove");
+        remove.onclick = () => {
+          files.splice(index, 1);
+          renderFileList(files, listElement);
+        };
+        li.appendChild(remove);
+        listElement.appendChild(li);
+      });
+    }
+
+    function setupDropZone(dropId, inputId, listId, fileArray) {
+      const drop = document.getElementById(dropId);
+      const input = document.getElementById(inputId);
+      const list = document.getElementById(listId);
+
+      drop.addEventListener("click", () => input.click());
+      drop.addEventListener("dragover", e => {
+        e.preventDefault();
+        drop.classList.add("dragover");
+      });
+      drop.addEventListener("dragleave", () => drop.classList.remove("dragover"));
+      drop.addEventListener("drop", e => {
+        e.preventDefault();
+        const dropped = [...e.dataTransfer.files];
+        fileArray.push(...dropped);
+        renderFileList(fileArray, list);
+        drop.classList.remove("dragover");
+      });
+      input.addEventListener("change", e => {
+        fileArray.push(...e.target.files);
+        renderFileList(fileArray, list);
+      });
+    }
+
+    //setupDropZone("ligand-drop", "ligand-input", "ligand-file-list", ligandFiles);
+    //setupDropZone("protein-drop", "protein-input", "protein-file-list", proteinFiles);
+
+    new Sortable(document.getElementById("module-panel"), {
+      group: { name: 'modules', pull: 'clone', put: false },
+      sort: false, animation: 150
+    });
+
+    new Sortable(canvas, {
+      group: { name: 'modules', pull: true, put: true },
+      sort: true, animation: 150
+    });
+
+    new Sortable(document.getElementById("trash"), {
+      group: { name: 'modules', pull: false, put: true },
+      sort: false, animation: 150,
+      onAdd: evt => evt.item.remove()
+    });
+
+    function submitModules() {
+
+      const isLocal = document.getElementById("use-local-checkbox").checked;
+
+      if (!isLocal && !slurmLocked) {
+        alert("⚠️ Please confirm your Slurm settings before running the pipeline.");
+        return;
+      }
+
+
+      const steps = [...canvas.querySelectorAll('li')].map(li => li.dataset.module);
+      if (!steps.length) {
+        alert("⚠️ Please drag at least one module into your workflow.");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("use_local", isLocal);
+      formData.append("user_name", document.getElementById("user-name").value);
+      formData.append("job_name", document.getElementById("slurm-jobname").value);
+      formData.append("slurm_cpus", document.getElementById("slurm-cpus").value);
+      formData.append("slurm_mem", document.getElementById("slurm-mem").value);
+      formData.append("slurm_time", document.getElementById("slurm-time").value);
+      formData.append("slurm_partition", document.getElementById("slurm-partition").value);
+      formData.append("slurm_nodelist", document.getElementById("slurm-nodelist").value);
+      formData.append("slurm_gres", document.getElementById("slurm-gres").value);
+      formData.append("slurm_output", document.getElementById("slurm-output").value);
+
+      // formData.append("ligand_source", document.getElementById("ligand-source").value);
+      // const ligandMode = document.querySelector('input[name="ligand-mode"]:checked').value;
+
+      //   if (ligandMode === "upload") {
+      //     ligandFiles.forEach(file => formData.append("ligand_files", file));
+      //   } else if (ligandMode === "path") {
+      //     formData.append("ligand_path", document.getElementById("ligand-path").value);
+      //   }
+
+      //   const proteinMode = document.querySelector('input[name="protein-mode"]:checked').value;
+
+      //   if (proteinMode === "upload") {
+      //     proteinFiles.forEach(file => formData.append("protein_files", file));
+      //   } else if (proteinMode === "path") {
+      //     formData.append("protein_path", document.getElementById("protein-path").value);
+      //   }
+
+      formData.append("modules", JSON.stringify(steps));
+
+      fetch('/run', {
+        method: 'POST',
+        body: formData
+      })
+      .then(res => res.json())
+      .then(data => {
+        alert(data.message || "Pipeline executed!");
+
+        // run_id 추출
+        const runId = data.run_id || data.report_file?.replace(/^report_/, '').replace(/\.html$/, '');
+
+        if (runId) {
+          // ✅ 대시보드로 이동하면서 run_id를 하이라이트 파라미터로 넘김
+          window.location.href = `/dashboard?highlight=${runId}`;
+        } else {
+          alert("❗ run_id not found in response.");
+        }
+      })
+      .catch(err => {
+        alert("서버 요청 실패: " + err.message);
+      });
+    }
+
+    function resetBuilder() {
+      //document.getElementById("ligand-source").value = "None";
+      ligandFiles.length = 0;
+      proteinFiles.length = 0;
+      //document.getElementById("ligand-file-list").innerHTML = "";
+      //document.getElementById("protein-file-list").innerHTML = "";
+      //document.getElementById("ligand-input").value = "";
+      //document.getElementById("protein-input").value = "";
+      //document.getElementById("workflow-canvas").innerHTML = "";
+
+      resetSlurmInputs();
+    }
+
+    function confirmSlurmSettings() {
+      const ids = [
+        "slurm-cpus",
+        "slurm-mem",
+        "slurm-time",
+        "slurm-partition",
+        "slurm-nodelist",
+        "slurm-gres",
+        "slurm-jobname",
+        "slurm-output"
+      ];
+
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.disabled = true;
+      });
+
+      // 버튼도 비활성화
+      document.getElementById("confirm-slurm-btn").disabled = true;
+      document.getElementById("confirm-slurm-btn").textContent = "✅ Slurm Settings Locked";
+
+      // ✅ Ligand 입력 초기화
+      document.querySelector('input[name="ligand-mode"][value="upload"]').checked = true;
+      toggleLigandMode();
+      document.getElementById("ligand-path").value = "";
+
+      // ✅ Protein 입력 초기화
+      document.querySelector('input[name="protein-mode"][value="upload"]').checked = true;
+      toggleProteinMode();
+      document.getElementById("protein-path").value = "";
+
+    }
+
+    let slurmLocked = false;
+
+    function toggleSlurmSettings() {
+      const ids = [
+        "slurm-cpus",
+        "slurm-mem",
+        "slurm-time",
+        "slurm-partition",
+        "slurm-nodelist",
+        "slurm-gres",
+        "slurm-jobname",
+        "slurm-output"
+      ];
+
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.disabled = !el.disabled;  // toggle
+      });
+
+      const btn = document.getElementById("confirm-slurm-btn");
+
+      if (!slurmLocked) {
+        btn.textContent = "🔓 Unlock Slurm Settings";
+        btn.style.background = "#999";  // optional visual cue
+      } else {
+        btn.textContent = "🔒 Confirm Slurm Settings";
+        btn.style.background = "#007acc";
+      }
+
+      slurmLocked = !slurmLocked;
+    }
+
+    function resetSlurmInputs() {
+      const defaults = {
+        "slurm-cpus": "4",
+        "slurm-mem": "8",
+        "slurm-time": "02:00:00",
+        "slurm-partition": "",
+        "slurm-nodelist": "",
+        "slurm-gres": "",
+        "slurm-jobname": "",
+        "slurm-output": ""
+      };
+
+      Object.entries(defaults).forEach(([id, value]) => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.disabled = false;
+          el.value = value;
+        }
+      });
+
+      const btn = document.getElementById("confirm-slurm-btn");
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = "🔒 Confirm Slurm Settings";
+        btn.style.background = "#007acc";
+      }
+
+      slurmLocked = false;  // 상태 변수도 리셋
+    }
+
+    function toggleLigandMode() {
+      const mode = document.querySelector('input[name="ligand-mode"]:checked').value;
+      document.getElementById("ligand-upload-area").style.display = mode === "upload" ? "block" : "none";
+      document.getElementById("ligand-path-area").style.display = mode === "path" ? "block" : "none";
+    }
+
+    function toggleProteinMode() {
+      const mode = document.querySelector('input[name="protein-mode"]:checked').value;
+      document.getElementById("protein-upload-area").style.display = mode === "upload" ? "block" : "none";
+      document.getElementById("protein-path-area").style.display = mode === "path" ? "block" : "none";
+    }
+
+    function toggleLocalMode() {
+      const isLocal = document.getElementById("use-local-checkbox").checked;
+
+      const slurmFields = [
+        "slurm-cpus",
+        "slurm-mem",
+        "slurm-time",
+        "slurm-partition",
+        "slurm-nodelist",
+        "slurm-gres",
+        "slurm-output",
+        "confirm-slurm-btn"
+      ];
+
+      slurmFields.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.disabled = isLocal;
+      });
+
+      // ✅ Job Name은 항상 활성 상태 유지
+      const jobEl = document.getElementById("slurm-jobname");
+      if (jobEl) jobEl.disabled = false;
+
+      // Slurm 잠금 상태도 리셋
+      slurmLocked = !isLocal;
+
+      // Slurm 버튼 텍스트도 업데이트
+      const btn = document.getElementById("confirm-slurm-btn");
+      if (btn && isLocal) {
+        btn.textContent = "🔒 Confirm Slurm Settings";
+        btn.style.background = "#999";
+      }
+    }
+
+    const nodeHosts = [
+      { name: "node01", ip: "10.10.20.10:8000" },
+      { name: "node02", ip: "10.10.20.11:8000" },
+      { name: "node03", ip: "10.10.20.12:8500" }
+    ];
+
+// 1. 처음 한 번만 카드 틀 생성
+function initNodeCards() {
+  const container = document.getElementById("node-status-container");
+  nodeHosts.forEach(({ name }) => {
+    const card = document.createElement("div");
+    card.id = `node-card-${name}`;
+    card.style = `
+      background: white;
+      border-radius: 12px;
+      padding: 16px;
+      width: 400px;
+      font-family: Inter, sans-serif;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      transition: transform 0.2s ease;
+    `;
+    card.innerHTML = `<strong>🔄 ${name} loading...</strong>`;
+    container.appendChild(card);
+  });
+}
+
+
+// 2. 주기적으로 카드 내용만 업데이트
+function updateNodeData() {
+  nodeHosts.forEach(({ name, ip }) => {
+    fetch(`http://${ip}/system/status`)
+      .then(res => res.json())
+      .then(data => {
+        const color = data.cpu_percent > 80 ? "#e74c3c" :
+                      data.cpu_percent > 50 ? "#f1c40f" : "#2ecc71";
+
+        const html = `
+          <div style="font-weight: 700; color: #003366;">🖥️ ${data.host}</div>
+          <div style="margin-top: 6px;">
+            CPU: ${data.cpu_percent}% (${data.cpu_count} cores)<br>
+            Mem: ${data.mem_used} / ${data.mem_total} GB<br>
+            GPU: ${data.gpu_usage}
+          </div>
+          <div style="margin-top: 6px;">
+            <span style="padding: 4px 8px; background: ${color}; color: white; border-radius: 4px;">
+              ${data.cpu_percent > 80 ? "Busy" : data.cpu_percent > 50 ? "Moderate" : "Idle"}
+            </span>
+          </div>
+        `;
+
+        const card = document.getElementById(`node-card-${name}`);
+        if (card) card.innerHTML = `<div style="font-weight: 700; color: #003366; font-size: 16px; margin-bottom: 8px;">
+            🖥️ ${data.host}
+          </div>
+          <hr style="border-top: 1px solid #ddd; margin: 8px 0;">
+          <div style="line-height: 1.8; font-size: 14px; color: #333;">
+            <div><span style="font-weight:700; color:#003366;">🧠 CPU:</span> ${data.cpu_percent}% (${data.cpu_count} cores)</div>
+            <div><span style="font-weight:700; color:#003366;">💾 Memory:</span> ${data.mem_used} / ${data.mem_total} GB</div>
+            <div><span style="font-weight:700; color:#003366;">🎮 GPU:</span> ${data.gpu_usage}</div>
+          </div>
+          <div style="margin-top: 12px;">
+            <span style="
+              padding: 6px 10px;
+              background: ${color};
+              color: white;
+              border-radius: 6px;
+              font-weight: 600;
+              font-size: 12px;
+              letter-spacing: 0.5px;
+            ">
+              ${data.cpu_percent > 80 ? "Busy" : data.cpu_percent > 50 ? "Moderate" : "Idle"}
+            </span>
+          </div>
+        `;
+        ;
+      })
+      .catch(() => {
+        const card = document.getElementById(`node-card-${name}`);
+        if (card) {
+          card.innerHTML = `<strong style="color:#cc0000;">🚫 ${name} (${ip}) 연결 실패</strong>`;
+        }
+      });
+  });
+}
+
+// ✅ 실행
+initNodeCards();
+setTimeout(updateNodeData, 100);  // 약간 지연 실행
+setInterval(updateNodeData, 5000);
+
+</script>
 {% endblock %}
