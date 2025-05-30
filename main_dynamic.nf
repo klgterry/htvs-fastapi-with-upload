@@ -1,89 +1,52 @@
 nextflow.enable.dsl=2
 params.outdir = "./results/${workflow.runName}"
 
+curate_dir = Channel.fromPath('/home/bj/home/bj/protein_prep/curate_test')
 
-
-process reinventLinker {
+process proteinPrep {
     label 'gpu'
+
+    output:
+    path "curate/**"
+    path "curate/protein_prep/.done", emit: protein_done
+
+    script:
+    """
+    bash /curate.sh
+    
+    echo '▶ Copying output back into Nextflow work directory...'
+    rm -rf curate/protein_prep
+    mkdir -p curate
+    cp -r /curate/protein_prep curate/
+
+    touch curate/protein_prep/.done
+    """
+}
+
+
+process dockingSim {
+    label 'gpu'
+
+    input:
+    path dummy_input
 
     output:
     path "curate/**"
 
     script:
     """
-    mkdir -p /curate/linker
+    bash /curate.sh
 
-    bash /run_linker.sh
-
-    echo '▶ Copying reinvent linker output...'
+    echo '▶ Copying output back into Nextflow work directory...'
+    rm -rf curate/docking
     mkdir -p curate
-    cp -r /curate/linker curate/ || echo '⚠️ No output found'
+    cp -r /curate/docking curate/
     """
 }
-
-
-process reinventDenovo {
-    label 'gpu'
-
-    output:
-    path "curate/**"
-
-    script:
-    """
-    mkdir -p /curate/denovo
-
-    bash /run_denovo.sh
-
-    echo '▶ Copying reinvent Denovo output...'
-    mkdir -p curate
-    cp -r /curate/denovo curate/ || echo '⚠️ No output found'
-    """
-}
-
-
-process reinventMolopt {
-    label 'gpu'
-
-    output:
-    path "curate/**"
-
-    script:
-    """
-    mkdir -p /curate/molopt
-
-    bash /run_opt.sh
-
-    echo '▶ Copying reinvent Molopt output...'
-    mkdir -p curate
-    cp -r /curate/molopt curate/ || echo '⚠️ No output found'
-    """
-}
-
-
-process reinventScaffold {
-    label 'gpu'
-
-    output:
-    path "curate/**"
-
-    script:
-    """
-    mkdir -p /curate/scaffold
-
-    bash /run_scaffold.sh
-
-    echo '▶ Copying reinvent Scaffold output...'
-    mkdir -p curate
-    cp -r /curate/scaffold curate/ || echo '⚠️ No output found'
-    """
-}
-
 
 workflow {
-    reinventLinker()
-    reinventDenovo()
-    reinventMolopt()
-    reinventScaffold()
+    protein_result = proteinPrep()
+    dockingSim(protein_result.protein_done)
 }
 
 

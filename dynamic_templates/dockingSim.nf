@@ -1,6 +1,9 @@
 process dockingSim {
     label 'gpu'
 
+    input:
+    path dummy_input
+
     output:
     path "curate/**"
 

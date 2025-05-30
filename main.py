@@ -87,16 +87,23 @@ def generate_main_nf(modules: list[str], curate_path: str = None, sdf_path: str 
     workflow = "workflow {\n"
     if "proteinPrep" in modules:
         script += Path("dynamic_templates/proteinPrep.nf").read_text() + "\n\n"
-        workflow += "    proteinPrep()\n"
+        workflow += "    protein_result = proteinPrep()\n"
+
     if "dockingSim" in modules:
         script += Path("dynamic_templates/dockingSim.nf").read_text() + "\n\n"
-        workflow += "    dockingSim()\n"
+        if "proteinPrep" in modules:
+            workflow += "    dockingSim(protein_result.protein_done)\n"
+        else:
+            workflow += "    dockingSim()\n"
     if "ranking" in modules:
         script += Path("dynamic_templates/ranking.nf").read_text()
         workflow += "    ranking(docking.dock_out)\n"
     if "scaffoldDelete" in modules:
         script += Path("dynamic_templates/scaffoldDelete.nf").read_text() + "\n\n"
         workflow += "    scaffoldDelete()\n"
+    if "scaffoldSafe" in modules:
+        script += Path("dynamic_templates/scaffoldSafe.nf").read_text() + "\n\n"
+        workflow += "    scaffoldSafe()\n"
     if "reinventLinker" in modules:
         script += Path("dynamic_templates/reinventLinker.nf").read_text() + "\n\n"
         workflow += "    reinventLinker()\n"
@@ -148,6 +155,7 @@ async def run_pipeline(
     request: Request,
     modules: str = Form(...),
     user_name: Optional[str] = Form("unknown"),
+    input_path: str = Form(...),
     job_name: Optional[str] = Form("unnamed"),
     use_local: Optional[bool] = Form(False),
     ligand_source: Optional[str] = Form(None),
@@ -212,16 +220,76 @@ async def run_pipeline(
         "run_id": run_id,
         "user": user_name,
         "job_name": job_name,
+        "input_path": input_path,
         "use_local": use_local,
         "start_time": time.strftime('%Y-%m-%d %H:%M:%S')
     }))
 
+    def generate_nextflow_config(input_path: str):
+        base_curate = f"{input_path}"
+
+        config = f"""
+    process {{
+    withName: proteinPrep {{
+        container = 'protein_prep'
+        containerOptions = '--rm --gpus all --volume {base_curate}:/curate'
+    }}
+
+    withName: dockingSim {{
+        container = 'docking'
+        containerOptions = '--rm --gpus all --volume {base_curate}:/curate'
+    }}
+
+    withName: scaffoldDelete {{
+        container = 'scaffold_alpha'
+        containerOptions = '--rm --gpus all --volume {base_curate}:/curate'
+    }}
+
+    withName: scaffoldSafe {{
+        container = 'scaffold_alpha'
+        containerOptions = '--rm --gpus all --volume {base_curate}:/curate'
+    }}
+
+    withName: reinventLinker {{
+        container = 'reinvent:1.2'
+        containerOptions = '--rm --gpus all --volume {base_curate}:/curate'
+    }}
+
+    withName: reinventDenovo {{
+        container = 'reinvent:1.2'
+        containerOptions = '--rm --gpus all --volume {base_curate}:/curate'
+    }}
+
+    withName: reinventMolopt {{
+        container = 'reinvent:1.2'
+        containerOptions = '--rm --gpus all --volume {base_curate}:/curate'
+    }}
+
+    withName: reinventScaffold {{
+        container = 'reinvent:1.2'
+        containerOptions = '--rm --gpus all --volume {base_curate}:/curate'
+    }}
+    }}
+
+    docker {{
+    enabled = true
+    path = '/usr/bin/docker'
+    }}
+    """
+        Path("nextflow.config").write_text(config)
+
+    generate_nextflow_config(
+    input_path=input_path
+    )
+
+
     # Generate Nextflow script dynamically
     generate_main_nf(
         modules=modules,
-        curate_path="/home/klgterry/curate",  # <- adjust if needed
-        #sdf_path=sdf_path
+        curate_path=f"/home/{user_name}{input_path}"
+        # sdf_path=... (필요 시)
     )
+
 
     # Run Nextflow as background process with nohup
     nf_command = (

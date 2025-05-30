@@ -1,4 +1,4 @@
-process scaffoldDelete {
+process scaffoldSafe {
     label 'gpu'
 
     output:
@@ -6,11 +6,11 @@ process scaffoldDelete {
 
     script:
     """
-    bash /script/run_delete.sh
+    bash /script/run_safe.sh
 
     echo '▶ Copying scaffold output...'
-    rm -rf curate/delete
+    rm -rf curate/safe
     mkdir -p curate
-    cp -r /curate/delete curate/
+    cp -r /curate/safe curate/
     """
 }

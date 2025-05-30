@@ -168,7 +168,6 @@
             style="list-style: none; padding: 10px; min-height: 725px; border: 2px dashed #ccc; border-radius: 10px; background-color: #fff;">
             <li data-module="proteinPrep">🧪 Protein Preparation</li>
             <li data-module="dockingSim">⚙️ Docking Simulation</li>
-            <li data-module="ranking">📊 Ranking & Scoring</li>
         </ul>
     </div>
 
@@ -260,7 +259,11 @@
 
         <!-- ✅ User Name -->
         <label class="upload-label">User Name</label>
-        <input type="text" id="user-name" value="klgterry" placeholder="e.g., klgterry" style="width: 100%; margin-bottom: 12px;">
+        <input type="text" id="user-name" placeholder="e.g., klgterry" style="width: 100%; margin-bottom: 12px;">
+
+        <!-- ✅ Input Path -->
+        <label class="upload-label">Input Path</label>
+        <input type="text" id="input-path" placeholder="e.g., /home/klgterry/curate" style="width: 100%; margin-bottom: 12px;">
 
         <!-- ✅ Job Name (항상 활성) -->
         <label class="upload-label">Job Name</label>
@@ -378,13 +381,26 @@
 
     function submitModules() {
 
+      const userName = document.getElementById("user-name").value.trim();
+      const inputPath = document.getElementById("input-path").value.trim();
+
+      // ✅ 필수 입력값 확인
+      if (!userName) {
+        alert("⚠️ Please enter a User Name.");
+        return;
+      }
+
+      if (!inputPath) {
+        alert("⚠️ Please enter an Input Path.");
+        return;
+      }
+
       const isLocal = document.getElementById("use-local-checkbox").checked;
 
       if (!isLocal && !slurmLocked) {
         alert("⚠️ Please confirm your Slurm settings before running the pipeline.");
         return;
       }
-
 
       const steps = [...canvas.querySelectorAll('li')].map(li => li.dataset.module);
       if (!steps.length) {
@@ -395,6 +411,7 @@
       const formData = new FormData();
       formData.append("use_local", isLocal);
       formData.append("user_name", document.getElementById("user-name").value);
+      formData.append("input_path", document.getElementById("input-path").value);
       formData.append("job_name", document.getElementById("slurm-jobname").value);
       formData.append("slurm_cpus", document.getElementById("slurm-cpus").value);
       formData.append("slurm_mem", document.getElementById("slurm-mem").value);
