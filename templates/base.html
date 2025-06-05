@@ -2,8 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>{% block title %}AIDD{% endblock %}</title>
+  <title>{% block title %}AIDD{% endblock %}</title>  <!-- ✅ 페이지별 개별 타이틀 지정 가능 -->
+
+  <!-- ✅ Google Fonts: 'Inter' 폰트 로드 -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- ✅ 기본 스타일 정의 -->
   <style>
     html, body {
       height: 100%;
@@ -20,9 +24,10 @@
     }
 
     main {
-      flex: 1;
+      flex: 1; /* ✅ 콘텐츠가 페이지 전체를 채우게 */
     }
 
+    /* ✅ 상단 네비게이션 바 */
     nav {
       background-color: #003366;
       padding: 14px 30px;
@@ -45,6 +50,7 @@
       font-weight: 500;
     }
 
+    /* ✅ Hero Section 스타일 (Home 페이지용) */
     .hero {
       padding: 80px 40px;
       text-align: center;
@@ -76,6 +82,7 @@
       margin-top: 30px;
     }
 
+    /* ✅ Section (소개 등 블럭 콘텐츠) */
     .section {
       padding: 60px 30px;
       max-width: 900px;
@@ -91,6 +98,7 @@
       line-height: 1.6;
     }
 
+    /* ✅ Footer 스타일 */
     footer {
       text-align: center;
       padding: 20px;
@@ -100,9 +108,10 @@
     }
   </style>
 </head>
+
 <body>
   <div class="page-wrapper">
-    <!-- Navigation Bar -->
+    <!-- ✅ Navigation Bar (상단 메뉴) -->
     <nav>
       <a href="/" class="brand">🧠 AIDD</a>
       <div class="nav-links">
@@ -114,12 +123,12 @@
       </div>
     </nav>
 
-    <!-- Main Content -->
+    <!-- ✅ Main content 영역 (개별 페이지 내용 삽입 위치) -->
     <main>
       {% block content %}{% endblock %}
     </main>
 
-    <!-- Footer -->
+    <!-- ✅ Footer (하단 정보) -->
     <footer>
       © 2025 AIDD — Empowering intelligent drug discovery.
     </footer>

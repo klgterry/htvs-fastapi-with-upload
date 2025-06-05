@@ -13,6 +13,7 @@ import uuid
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 
+# ✅ 결과 HTML (report.html, timeline.html) 표시 페이지
 @app.get("/results/{run_id}", response_class=HTMLResponse)
 async def show_results(request: Request, run_id: str):
     return templates.TemplateResponse("results.html", {
@@ -21,29 +22,30 @@ async def show_results(request: Request, run_id: str):
         "timeline_file": f"{run_id}/timeline.html"
     })
 
-# 🔻 정적 파일 경로 연결 (HTML 다운로드, iframe용)
+# ✅ 정적 파일 서빙 설정 (HTML 내부 iframe용 등)
 app.mount("/results", StaticFiles(directory="results"), name="results")
 
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
     return templates.TemplateResponse("home.html", {"request": request})
 
-
+# ✅ Drag & Drop 기반 HTVS 빌더 UI
 @app.get("/builder")
 async def builder_ui(request: Request):
     return templates.TemplateResponse("builder.html", {"request": request})
 
-
+# ✅ Scaffold hopping 빌더 페이지
 @app.get("/scaffold", response_class=HTMLResponse)
 async def scaffold_page(request: Request):
     return templates.TemplateResponse("scaffold.html", {"request": request})
 
 
+# ✅ Molecular Generation 빌더 페이지
 @app.get("/generation", response_class=HTMLResponse)
 async def generation_page(request: Request):
     return templates.TemplateResponse("generation.html", {"request": request})
 
-
+# ✅ 파일 업로드 (ligand/protein 파일 직접 업로드 처리)
 @app.post("/upload")
 async def upload_files(ligand: UploadFile = File(...), protein: UploadFile = File(...)):
     upload_dir = Path("uploads")
@@ -74,7 +76,7 @@ def generate_main_nf(modules: list[str], curate_path: str = None, sdf_path: str 
     header = "nextflow.enable.dsl=2\n"
     header += "params.outdir = \"./results/${workflow.runName}\"\n\n"
 
-    # Dynamic channels
+    # 🔻 채널 정의 (입력 경로)
     channels = []
     if "proteinPrep" in modules and curate_path:
         channels.append(f"curate_dir = Channel.fromPath('{curate_path}')")
@@ -82,9 +84,11 @@ def generate_main_nf(modules: list[str], curate_path: str = None, sdf_path: str 
         channels.append(f"ligand_file = Channel.fromPath('{sdf_path}')")
     channel_block = "\n".join(channels) + "\n\n"
 
-    # Process scripts and workflow steps
+    # 🔻 main.nf 내용 구성
     script = ""
     workflow = "workflow {\n"
+
+    # 모듈별 process 삽입 + workflow 호출 구성
     if "proteinPrep" in modules:
         script += Path("dynamic_templates/proteinPrep.nf").read_text() + "\n\n"
         workflow += "    protein_result = proteinPrep()\n"
@@ -104,6 +108,9 @@ def generate_main_nf(modules: list[str], curate_path: str = None, sdf_path: str 
     if "scaffoldSafe" in modules:
         script += Path("dynamic_templates/scaffoldSafe.nf").read_text() + "\n\n"
         workflow += "    scaffoldSafe()\n"
+    if "posebusters" in modules:
+        script += Path("dynamic_templates/posebusters.nf").read_text() + "\n\n"
+        workflow += "    posebusters()\n"
     if "reinventLinker" in modules:
         script += Path("dynamic_templates/reinventLinker.nf").read_text() + "\n\n"
         workflow += "    reinventLinker()\n"
@@ -119,7 +126,7 @@ def generate_main_nf(modules: list[str], curate_path: str = None, sdf_path: str 
 
     workflow += "}\n\n"
 
-    # Final block: status.json + report/timeline 이동
+    # ✅ workflow 완료 후 상태 저장용 JSON
     on_complete_block = """
 workflow.onComplete {
     def outdir = params.outdir
@@ -150,6 +157,7 @@ import json
 import subprocess
 import os
 
+# ✅ /run API → 모듈 및 설정 기반 파이프라인 실행
 @app.post("/run")
 async def run_pipeline(
     request: Request,
@@ -225,6 +233,7 @@ async def run_pipeline(
         "start_time": time.strftime('%Y-%m-%d %H:%M:%S')
     }))
 
+    # ✅ config + workflow 파일 생성
     def generate_nextflow_config(input_path: str):
         base_curate = f"{input_path}"
 
@@ -269,6 +278,11 @@ async def run_pipeline(
         container = 'reinvent:1.2'
         containerOptions = '--rm --gpus all --volume {base_curate}:/curate'
     }}
+
+    withName: posebusters {{
+        container = 'posebusters'
+        containerOptions = '--rm --gpus all --volume {base_curate}:/curate'
+    }}
     }}
 
     docker {{
@@ -290,8 +304,7 @@ async def run_pipeline(
         # sdf_path=... (필요 시)
     )
 
-
-    # Run Nextflow as background process with nohup
+    # ✅ Nextflow 백그라운드 실행
     nf_command = (
         f"nextflow run main_dynamic.nf "
         f"-with-docker -with-report {result_dir}/report.html -with-timeline {result_dir}/timeline.html "
@@ -307,6 +320,7 @@ async def run_pipeline(
         "run_id": run_id
     })
 
+# ✅ GPU 사용량 반환 함수 (nvidia-smi 기반)
 def get_gpu_info():
     try:
         output = subprocess.check_output(
@@ -331,6 +345,7 @@ def get_gpu_info():
     except Exception:
         return "Unavailable"
 
+# ✅ 노드 상태 반환 API (CPU, MEM, GPU)
 @app.get("/system/status")
 async def system_status():
     cpu_percent = psutil.cpu_percent(interval=0.5)
@@ -354,6 +369,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi import Request
 from fastapi import status
 
+# ✅ 요청 데이터 오류 처리 핸들러
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     return JSONResponse(
@@ -362,7 +378,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     )
 
 import time
-
+# ✅ 실행 결과 대시보드 페이지
 @app.get("/dashboard", response_class=HTMLResponse)
 def dashboard(request: Request):
     results_path = Path("./results")
@@ -381,6 +397,7 @@ def dashboard(request: Request):
             "start_time": time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(os.path.getctime(run_dir)))
         }
 
+        # ✅ 실행 결과 상태 반영
         if status_file.exists():
             try:
                 with open(status_file) as f:
@@ -389,7 +406,7 @@ def dashboard(request: Request):
             except:
                 pass
 
-        # ✅ 사용자 정보 추가
+        # ✅ 실행 메타데이터 반영
         if metadata_file.exists():
             try:
                 with open(metadata_file) as f:
@@ -405,7 +422,7 @@ def dashboard(request: Request):
         "runs": runs
     })
 
-
+# ✅ 실행 중인 run의 상태 반환
 @app.get("/run_status/{run_id}")
 def get_run_status(run_id: str):
     status_file = Path(f"./results/{run_id}/status.json")
@@ -426,6 +443,7 @@ def get_run_status(run_id: str):
 
 from fastapi import HTTPException
 
+# ✅ 실행 결과 삭제
 @app.delete("/delete/{run_id}")
 def delete_run(run_id: str):
     run_path = Path(f"./results/{run_id}")
@@ -436,6 +454,7 @@ def delete_run(run_id: str):
     else:
         raise HTTPException(status_code=404, detail="해당 run_id 디렉토리가 존재하지 않습니다.")
 
+# ✅ 최근 실행 내역 반환 (대시보드 카드 요약용)
 @app.get("/recent_runs")
 def get_recent_runs(n: int = 3):
     from pathlib import Path
@@ -454,7 +473,7 @@ def get_recent_runs(n: int = 3):
 
         runs.append({
             "run_id": meta.get("run_id", run_dir.name),
-            "status": "DONE",  # 또는 별도로 status 저장한 경우 반영
+            "status": "DONE",  # TODO: status.json에서 실제 상태 가져와도 됨
             "user": meta.get("user", "unknown"),
             "job_name": meta.get("job_name", "N/A"),
             "start_time": meta.get("start_time", "N/A")
