@@ -123,6 +123,18 @@ def generate_main_nf(modules: list[str], curate_path: str = None, sdf_path: str 
     if "reinventScaffold" in modules:
         script += Path("dynamic_templates/reinventScaffold.nf").read_text() + "\n\n"
         workflow += "    reinventScaffold()\n"
+    if "drugEx" in modules:
+        script += Path("dynamic_templates/drugEx.nf").read_text() + "\n\n"
+        workflow += "    drugEx()\n"
+    if "drugEx_RL" in modules:
+        script += Path("dynamic_templates/drugEx_RL.nf").read_text() + "\n\n"
+        workflow += "    drugEx_RL()\n"
+    if "diffLinker" in modules:
+        script += Path("dynamic_templates/diffLinker.nf").read_text() + "\n\n"
+        workflow += "    diffLinker()\n"
+    if "linker3D" in modules:
+        script += Path("dynamic_templates/linker3D.nf").read_text() + "\n\n"
+        workflow += "    linker3D()\n"
 
     workflow += "}\n\n"
 
@@ -281,6 +293,26 @@ async def run_pipeline(
 
     withName: posebusters {{
         container = 'posebusters'
+        containerOptions = '--rm --gpus all --volume {base_curate}:/curate'
+    }}
+
+    withName: drugEx {{
+        container = 'drugex:1.1'
+        containerOptions = '--rm --gpus all --volume {base_curate}:/curate'
+    }}
+
+    withName: drugEx_RL {{
+        container = 'drugex:1.1'
+        containerOptions = '--rm --gpus all --volume {base_curate}:/curate'
+    }}
+
+    withName: diffLinker {{
+        container = 'hientt-difflinker-clean-gpu'
+        containerOptions = '--rm --gpus all --volume {base_curate}:/curate'
+    }}
+
+    withName: linker3D {{
+        container = 'hientt-difflinker-clean-gpu'
         containerOptions = '--rm --gpus all --volume {base_curate}:/curate'
     }}
     }}
