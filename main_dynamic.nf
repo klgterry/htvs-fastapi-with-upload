@@ -3,7 +3,7 @@ params.outdir = "./results/${workflow.runName}"
 
 
 
-process linker3D {
+process dockingSim_default {
     label 'gpu'
 
     output:
@@ -11,19 +11,15 @@ process linker3D {
 
     script:
     """
-    mkdir -p /curate/3dlinker
-
-    bash /run_3dlinker.sh
-
-    echo '▶ Copying 3dlinker output...'
-    mkdir -p curate
-    cp -r /curate/3dlinker curate/ || echo '⚠️ No output found'
+    echo '▶ Docking with no input'
+    bash /curate.sh
+    cp -r /curate/docking curate/
     """
 }
 
 
 workflow {
-    linker3D()
+    dockingSim_default()
 }
 
 

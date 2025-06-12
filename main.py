@@ -78,11 +78,21 @@ def generate_main_nf(modules: list[str], curate_path: str = None, sdf_path: str 
 
     # 🔻 채널 정의 (입력 경로)
     channels = []
+
+    # proteinPrep용 curate_dir 채널 (단일 선언 보장)
     if "proteinPrep" in modules and curate_path:
-        channels.append(f"curate_dir = Channel.fromPath('{curate_path}')")
+        channels.append(f"protein_curate_dir = Channel.fromPath('{curate_path}')")
+
+    # ligandPrep용 curate_dir 채널 (같은 경로라도 별도 채널로 선언)
+    if "ligandPrep" in modules and curate_path:
+        channels.append(f"ligand_curate_dir = Channel.fromPath('{curate_path}')")
+
+    # dockingSim용 ligand_file 채널
     if "dockingSim" in modules and sdf_path:
         channels.append(f"ligand_file = Channel.fromPath('{sdf_path}')")
+
     channel_block = "\n".join(channels) + "\n\n"
+
 
     # 🔻 main.nf 내용 구성
     script = ""
@@ -92,13 +102,22 @@ def generate_main_nf(modules: list[str], curate_path: str = None, sdf_path: str 
     if "proteinPrep" in modules:
         script += Path("dynamic_templates/proteinPrep.nf").read_text() + "\n\n"
         workflow += "    protein_result = proteinPrep()\n"
-
+    if "ligandPrep" in modules:
+        script += Path("dynamic_templates/ligandPrep.nf").read_text() + "\n\n"
+        workflow += "    ligand_result = ligandPrep()\n"
     if "dockingSim" in modules:
-        script += Path("dynamic_templates/dockingSim.nf").read_text() + "\n\n"
-        if "proteinPrep" in modules:
-            workflow += "    dockingSim(protein_result.protein_done)\n"
+        if "proteinPrep" in modules and "ligandPrep" in modules:
+            script += Path("dynamic_templates/dockingSim_full.nf").read_text() + "\n\n"
+            workflow += "    dockingSim_full(protein_result.protein_done, ligand_result.ligand_done)\n"
+        elif "proteinPrep" in modules:
+            script += Path("dynamic_templates/dockingSim_with_protein_only.nf").read_text() + "\n\n"
+            workflow += "    dockingSim_with_protein_only(protein_result.protein_done)\n"
+        elif "ligandPrep" in modules:
+            script += Path("dynamic_templates/dockingSim_with_ligand_only.nf").read_text() + "\n\n"
+            workflow += "    dockingSim_with_ligand_only(ligand_result.ligand_done)\n"
         else:
-            workflow += "    dockingSim()\n"
+            script += Path("dynamic_templates/dockingSim_default.nf").read_text() + "\n\n"
+            workflow += "    dockingSim_default()\n"
     if "ranking" in modules:
         script += Path("dynamic_templates/ranking.nf").read_text()
         workflow += "    ranking(docking.dock_out)\n"
@@ -256,7 +275,27 @@ async def run_pipeline(
         containerOptions = '--rm --gpus all --volume {base_curate}:/curate'
     }}
 
-    withName: dockingSim {{
+    withName: ligandPrep {{
+        container = 'protein_prep'
+        containerOptions = '--rm --gpus all --volume {base_curate}:/curate'
+    }}
+
+    withName: dockingSim_full {{
+    container = 'docking'
+    containerOptions = '--rm --gpus all --volume {base_curate}:/curate'
+    }}
+
+    withName: dockingSim_with_protein_only {{
+        container = 'docking'
+        containerOptions = '--rm --gpus all --volume {base_curate}:/curate'
+    }}
+
+    withName: dockingSim_with_ligand_only {{
+        container = 'docking'
+        containerOptions = '--rm --gpus all --volume {base_curate}:/curate'
+    }}
+
+    withName: dockingSim_default {{
         container = 'docking'
         containerOptions = '--rm --gpus all --volume {base_curate}:/curate'
     }}
