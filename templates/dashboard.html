@@ -1,18 +1,45 @@
 {% extends "base.html" %}
 
-{% block title %}HTVS Dashboard{% endblock %}
+{% block title %}Dashboard – AIDD{% endblock %}
 
 {% block content %}
 <div style="padding-left: 40px; padding-top: 10px;">
   <h2 style="margin-top: 30px;">🚀 Execution Dashboard</h2>
   <p>Check the status of running jobs and view the completed results.</p>
 
+  <!-- 필터 UI 추가 (dashboard 상단에 배치) -->
+  <div style="margin-top: 16px; display: flex; gap: 24px; align-items: center;">
+    <div>
+      <label for="status-filter" style="font-weight: bold; margin-right: 8px;">🔍 Status:</label>
+      <select id="status-filter">
+        <option value="ALL">All</option>
+        <option value="RUNNING">Running</option>
+        <option value="DONE">Completed</option>
+        <option value="FAILED">Failed</option>
+      </select>
+    </div>
+    <div>
+      <label for="user-filter" style="font-weight: bold; margin-right: 8px;">👤 User:</label>
+      <select id="user-filter">
+        <option value="ALL">All</option>
+        {% for run in runs|unique(attribute='user') %}
+          <option value="{{ run.user }}">{{ run.user }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <!-- ✅ 전체 선택 버튼 -->
+  <button id="select-visible" style="padding: 4px 12px;">☑️ Select Visible</button>
+  <button id="deselect-all" style="padding: 4px 12px;">❎ Deselect All</button>
+  <button id="delete-selected" style="padding: 4px 12px;">🗑️ Delete Selected</button>
+  </div>
+
   <div id="dashboard" style="display: flex; flex-wrap: wrap; gap: 16px; margin-top: 24px;">
     {% for run in runs %}
       <div class="run-card"
            id="{{ run.run_id }}"
            style="border: 2px solid #ccc; border-radius: 8px; padding: 16px; width: 300px; background-color: #fdfdfd; box-shadow: 2px 2px 6px rgba(0,0,0,0.05);">
-
+    
         <!-- Status section: updated by JavaScript -->
         <h3 class="status" style="margin-top: 0;">
           {% if run.status == "DONE" %}
@@ -36,9 +63,12 @@
 
         <a href="/results/{{ run.run_id }}" style="color: #007acc;">📄 View Results</a>
         <button class="delete-btn" data-run="{{ run.run_id }}">🗑️ Delete</button>
+        <input type="checkbox" class="select-run" data-run="{{ run.run_id }}" style="margin-bottom: 8px;">
       </div>
     {% endfor %}
   </div>
+</div>
+
 </div>
 
 <script>
@@ -79,6 +109,7 @@
           progressElem.textContent = `Progress: ${data.succeeded}/${data.total}`;
         }
       });
+    applyFilter();
   }
 
 
@@ -109,6 +140,78 @@
             });
         });
     });
+
+  function applyFilter() {
+    const statusFilter = document.getElementById("status-filter").value;
+    const userFilter = document.getElementById("user-filter").value;
+
+    document.querySelectorAll(".run-card").forEach(card => {
+      const statusElem = card.querySelector("h3");
+      const userElem = card.querySelector("p:nth-of-type(2)");
+
+      const statusText = statusElem.textContent.trim();
+      const userText = userElem.textContent.replace("User:", "").trim();
+
+      const statusMatch =
+        statusFilter === "ALL" ||
+        (statusFilter === "DONE" && statusText.includes("Completed")) ||
+        (statusFilter === "FAILED" && statusText.includes("Failed")) ||
+        (statusFilter === "RUNNING" && statusText.includes("Running"));
+
+      const userMatch = userFilter === "ALL" || userText === userFilter;
+
+      card.style.display = statusMatch && userMatch ? "block" : "none";
+    });
+  }
+
+  document.getElementById("select-visible").addEventListener("click", () => {
+    const visibleCards = document.querySelectorAll(".run-card");
+    let count = 0;
+    visibleCards.forEach(card => {
+      if (card.style.display !== "none") {
+        const checkbox = card.querySelector(".select-run");
+        if (checkbox) {
+          checkbox.checked = true;
+          count++;
+        }
+      }
+    });
+    alert(`✅ ${count}개 항목이 선택되었습니다.`);
+  });
+
+  document.getElementById("deselect-all").addEventListener("click", () => {
+    const checkboxes = document.querySelectorAll(".select-run");
+    checkboxes.forEach(cb => cb.checked = false);
+    alert("✅ 모든 선택이 해제되었습니다.");
+  });
+
+  // 드롭다운 이벤트 바인딩
+  document.getElementById("status-filter").addEventListener("change", applyFilter);
+  document.getElementById("user-filter").addEventListener("change", applyFilter); 
+
+  document.getElementById("delete-selected").addEventListener("click", () => {
+    const selected = Array.from(document.querySelectorAll(".select-run:checked"))
+                          .map(cb => cb.dataset.run);
+
+    if (selected.length === 0) {
+      alert("삭제할 항목을 선택하세요.");
+      return;
+    }
+
+    if (!confirm(`정말로 ${selected.length}개 항목을 삭제하시겠습니까?`)) return;
+
+    selected.forEach(runId => {
+      fetch(`/delete/${runId}`, { method: 'DELETE' })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            document.getElementById(runId).remove();
+          } else {
+            alert(`❌ ${runId} 삭제 실패: ${data.message}`);
+          }
+        });
+    });
+  });
 </script>
 
 {% endblock %}

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Generation – AIDD{% endblock %}
+{% block title %}Molecular Generation – AIDD{% endblock %}
 
 {% block content %}
 <style>
@@ -265,6 +265,22 @@
 
         <!-- ✅ User Name -->
         <label class="upload-label">User Name</label>
+
+        <!-- 드롭다운으로 선택 -->
+        <select id="user-select" style="width: 101.7%; margin-bottom: 8px;">
+          <option value="">⬇️ Select a user...</option>
+          <option value="bj">bj</option>
+          <option value="hhan">hhan</option>
+          <option value="hientt">hientt</option>
+          <option value="hryoon">hryoon</option>
+          <option value="jyan">jyan</option>
+          <option value="klgterry">klgterry</option>
+          <option value="kp_kwon">kp_kwon</option>
+          <option value="rh">rh</option>
+          <!-- 더 추가 가능 -->
+        </select>
+
+        <!-- 직접 입력 가능 -->
         <input type="text" id="user-name" placeholder="e.g., klgterry" style="width: 100%; margin-bottom: 12px;">
 
         <!-- ✅ Input Path -->
@@ -631,89 +647,96 @@
       { name: "node04", ip: "218.154.20.170:8104" }
     ];
 
-// 1. 처음 한 번만 카드 틀 생성
-function initNodeCards() {
-  const container = document.getElementById("node-status-container");
-  nodeHosts.forEach(({ name }) => {
-    const card = document.createElement("div");
-    card.id = `node-card-${name}`;
-    card.style = `
-      background: white;
-      border-radius: 12px;
-      padding: 16px;
-      width: 400px;
-      font-family: Inter, sans-serif;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-      transition: transform 0.2s ease;
-    `;
-    card.innerHTML = `<strong>🔄 ${name} loading...</strong>`;
-    container.appendChild(card);
+  // 1. 처음 한 번만 카드 틀 생성
+  function initNodeCards() {
+    const container = document.getElementById("node-status-container");
+    nodeHosts.forEach(({ name }) => {
+      const card = document.createElement("div");
+      card.id = `node-card-${name}`;
+      card.style = `
+        background: white;
+        border-radius: 12px;
+        padding: 16px;
+        width: 400px;
+        font-family: Inter, sans-serif;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        transition: transform 0.2s ease;
+      `;
+      card.innerHTML = `<strong>🔄 ${name} loading...</strong>`;
+      container.appendChild(card);
+    });
+  }
+
+
+  // 2. 주기적으로 카드 내용만 업데이트
+  function updateNodeData() {
+    nodeHosts.forEach(({ name, ip }) => {
+      fetch(`http://${ip}/system/status`)
+        .then(res => res.json())
+        .then(data => {
+          const color = data.cpu_percent > 80 ? "#e74c3c" :
+                        data.cpu_percent > 50 ? "#f1c40f" : "#2ecc71";
+
+          const html = `
+            <div style="font-weight: 700; color: #003366;">🖥️ ${data.host}</div>
+            <div style="margin-top: 6px;">
+              CPU: ${data.cpu_percent}% (${data.cpu_count} cores)<br>
+              Mem: ${data.mem_used} / ${data.mem_total} GB<br>
+              GPU: ${data.gpu_usage}
+            </div>
+            <div style="margin-top: 6px;">
+              <span style="padding: 4px 8px; background: ${color}; color: white; border-radius: 4px;">
+                ${data.cpu_percent > 80 ? "Busy" : data.cpu_percent > 50 ? "Moderate" : "Idle"}
+              </span>
+            </div>
+          `;
+
+          const card = document.getElementById(`node-card-${name}`);
+          if (card) card.innerHTML = `<div style="font-weight: 700; color: #003366; font-size: 16px; margin-bottom: 8px;">
+              🖥️ ${data.host}
+            </div>
+            <hr style="border-top: 1px solid #ddd; margin: 8px 0;">
+            <div style="line-height: 1.8; font-size: 14px; color: #333;">
+              <div><span style="font-weight:700; color:#003366;">🧠 CPU:</span> ${data.cpu_percent}% (${data.cpu_count} cores)</div>
+              <div><span style="font-weight:700; color:#003366;">💾 Memory:</span> ${data.mem_used} / ${data.mem_total} GB</div>
+              <div><span style="font-weight:700; color:#003366;">🎮 GPU:</span> ${data.gpu_usage}</div>
+            </div>
+            <div style="margin-top: 12px;">
+              <span style="
+                padding: 6px 10px;
+                background: ${color};
+                color: white;
+                border-radius: 6px;
+                font-weight: 600;
+                font-size: 12px;
+                letter-spacing: 0.5px;
+              ">
+                ${data.cpu_percent > 80 ? "Busy" : data.cpu_percent > 50 ? "Moderate" : "Idle"}
+              </span>
+            </div>
+          `;
+          ;
+        })
+        .catch(() => {
+          const card = document.getElementById(`node-card-${name}`);
+          if (card) {
+            card.innerHTML = `<strong style="color:#cc0000;">🚫 ${name} (${ip}) 연결 실패</strong>`;
+          }
+        });
+    });
+  }
+
+  // ✅ 실행
+  initNodeCards();
+  setTimeout(updateNodeData, 100);  // 약간 지연 실행
+  setInterval(updateNodeData, 5000);
+
+  document.getElementById("user-select").addEventListener("change", function () {
+    const selected = this.value;
+    if (selected) {
+      document.getElementById("user-name").value = selected;
+    }
   });
-}
-
-
-// 2. 주기적으로 카드 내용만 업데이트
-function updateNodeData() {
-  nodeHosts.forEach(({ name, ip }) => {
-    fetch(`http://${ip}/system/status`)
-      .then(res => res.json())
-      .then(data => {
-        const color = data.cpu_percent > 80 ? "#e74c3c" :
-                      data.cpu_percent > 50 ? "#f1c40f" : "#2ecc71";
-
-        const html = `
-          <div style="font-weight: 700; color: #003366;">🖥️ ${data.host}</div>
-          <div style="margin-top: 6px;">
-            CPU: ${data.cpu_percent}% (${data.cpu_count} cores)<br>
-            Mem: ${data.mem_used} / ${data.mem_total} GB<br>
-            GPU: ${data.gpu_usage}
-          </div>
-          <div style="margin-top: 6px;">
-            <span style="padding: 4px 8px; background: ${color}; color: white; border-radius: 4px;">
-              ${data.cpu_percent > 80 ? "Busy" : data.cpu_percent > 50 ? "Moderate" : "Idle"}
-            </span>
-          </div>
-        `;
-
-        const card = document.getElementById(`node-card-${name}`);
-        if (card) card.innerHTML = `<div style="font-weight: 700; color: #003366; font-size: 16px; margin-bottom: 8px;">
-            🖥️ ${data.host}
-          </div>
-          <hr style="border-top: 1px solid #ddd; margin: 8px 0;">
-          <div style="line-height: 1.8; font-size: 14px; color: #333;">
-            <div><span style="font-weight:700; color:#003366;">🧠 CPU:</span> ${data.cpu_percent}% (${data.cpu_count} cores)</div>
-            <div><span style="font-weight:700; color:#003366;">💾 Memory:</span> ${data.mem_used} / ${data.mem_total} GB</div>
-            <div><span style="font-weight:700; color:#003366;">🎮 GPU:</span> ${data.gpu_usage}</div>
-          </div>
-          <div style="margin-top: 12px;">
-            <span style="
-              padding: 6px 10px;
-              background: ${color};
-              color: white;
-              border-radius: 6px;
-              font-weight: 600;
-              font-size: 12px;
-              letter-spacing: 0.5px;
-            ">
-              ${data.cpu_percent > 80 ? "Busy" : data.cpu_percent > 50 ? "Moderate" : "Idle"}
-            </span>
-          </div>
-        `;
-        ;
-      })
-      .catch(() => {
-        const card = document.getElementById(`node-card-${name}`);
-        if (card) {
-          card.innerHTML = `<strong style="color:#cc0000;">🚫 ${name} (${ip}) 연결 실패</strong>`;
-        }
-      });
-  });
-}
-
-// ✅ 실행
-initNodeCards();
-setTimeout(updateNodeData, 100);  // 약간 지연 실행
-setInterval(updateNodeData, 5000);
 
 </script>
 {% endblock %}

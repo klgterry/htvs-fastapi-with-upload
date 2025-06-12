@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}HTVS Builder – AIDD{% endblock %}
+{% block title %}HTVS Protocol – AIDD{% endblock %}
 
 {% block content %}
 <style>
@@ -260,7 +260,24 @@
 
         <!-- ✅ User Name -->
         <label class="upload-label">User Name</label>
+
+        <!-- 드롭다운으로 선택 -->
+        <select id="user-select" style="width: 101.7%; margin-bottom: 8px;">
+          <option value="">⬇️ Select a user...</option>
+          <option value="bj">bj</option>
+          <option value="hhan">hhan</option>
+          <option value="hientt">hientt</option>
+          <option value="hryoon">hryoon</option>
+          <option value="jyan">jyan</option>
+          <option value="klgterry">klgterry</option>
+          <option value="kp_kwon">kp_kwon</option>
+          <option value="rh">rh</option>
+          <!-- 더 추가 가능 -->
+        </select>
+
+        <!-- 직접 입력 가능 -->
         <input type="text" id="user-name" placeholder="e.g., klgterry" style="width: 100%; margin-bottom: 12px;">
+
 
         <!-- ✅ Input Path -->
         <label class="upload-label">Input Path</label>
@@ -708,6 +725,13 @@ function updateNodeData() {
 initNodeCards();
 setTimeout(updateNodeData, 100);  // 약간 지연 실행
 setInterval(updateNodeData, 5000);
+
+document.getElementById("user-select").addEventListener("change", function () {
+  const selected = this.value;
+  if (selected) {
+    document.getElementById("user-name").value = selected;
+  }
+});
 
 </script>
 {% endblock %}

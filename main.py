@@ -527,7 +527,7 @@ def delete_run(run_id: str):
 
 # ✅ 최근 실행 내역 반환 (대시보드 카드 요약용)
 @app.get("/recent_runs")
-def get_recent_runs(n: int = 3):
+def get_recent_runs(n: int = 6):
     from pathlib import Path
     import os, json
 
